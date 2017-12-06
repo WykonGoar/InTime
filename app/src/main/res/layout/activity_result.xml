@@ -1,0 +1,163 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#0099cc"
+    tools:context="com.wykon.intime.activity.ResultActivity">
+
+    <!-- The primary full-screen view. This can be replaced with whatever view
+         is needed to present your content, e.g. VideoView, SurfaceView,
+         TextureView, etc. -->
+
+    <!-- This FrameLayout insets its children based on system windows using
+         android:fitsSystemWindows. -->
+
+    <TextView
+        android:id="@+id/tvText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:fontFamily="@font/aladin_regular"
+        android:textAlignment="center"
+        android:textColor="@android:color/white"
+        android:textSize="26sp"
+        android:visibility="visible"
+        tools:text="Geef aan welke woorden geraden zijn" />
+
+    <RelativeLayout
+        android:id="@+id/rlWords"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginBottom="40dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="40dp"
+        android:background="@drawable/rounded_backround"
+        android:paddingBottom="20dp"
+        android:paddingEnd="10dp"
+        android:paddingStart="10dp"
+        android:paddingTop="20dp">
+
+        <ScrollView
+            android:id="@+id/svWords"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <CheckedTextView
+                    android:id="@+id/ctvWord1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:checkMark="?android:attr/textCheckMark"
+                    android:checked="false"
+                    android:fontFamily="@font/aladin_regular"
+                    android:text="CheckedTextView"
+                    android:textAllCaps="false"
+                    android:textColor="@color/gameWord"
+                    android:textSize="30sp"
+                    tools:text="test" />
+
+                <CheckedTextView
+                    android:id="@+id/ctvWord2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/ctvWord1"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="9dp"
+                    android:checkMark="?android:attr/textCheckMark"
+                    android:checked="false"
+                    android:fontFamily="@font/aladin_regular"
+                    android:text="CheckedTextView"
+                    android:textAllCaps="false"
+                    android:textColor="@color/gameWord"
+                    android:textSize="30sp"
+                    tools:text="test" />
+
+                <CheckedTextView
+                    android:id="@+id/ctvWord3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/ctvWord2"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="9dp"
+                    android:checkMark="?android:attr/textCheckMark"
+                    android:checked="false"
+                    android:fontFamily="@font/aladin_regular"
+                    android:text="CheckedTextView"
+                    android:textAllCaps="false"
+                    android:textColor="@color/gameWord"
+                    android:textSize="30sp"
+                    tools:text="test" />
+
+                <CheckedTextView
+                    android:id="@+id/ctvWord4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/ctvWord3"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="9dp"
+                    android:checkMark="?android:attr/textCheckMark"
+                    android:checked="false"
+                    android:fontFamily="@font/aladin_regular"
+                    android:text="CheckedTextView"
+                    android:textAllCaps="false"
+                    android:textColor="@color/gameWord"
+                    android:textSize="30sp"
+                    tools:text="test" />
+
+                <CheckedTextView
+                    android:id="@+id/ctvWord5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/ctvWord4"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="9dp"
+                    android:checkMark="?android:attr/textCheckMark"
+                    android:checked="false"
+                    android:fontFamily="@font/aladin_regular"
+                    android:text="CheckedTextView"
+                    android:textAllCaps="false"
+                    android:textColor="@color/gameWord"
+                    android:textSize="30sp"
+                    android:visibility="gone"
+                    tools:text="test" />
+
+                <CheckedTextView
+                    android:id="@+id/ctvWord6"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/ctvWord5"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="9dp"
+                    android:checkMark="?android:attr/textCheckMark"
+                    android:checked="false"
+                    android:fontFamily="@font/aladin_regular"
+                    android:text="CheckedTextView"
+                    android:textAllCaps="false"
+                    android:textColor="@color/gameWord"
+                    android:textSize="30sp"
+                    android:visibility="gone"
+                    tools:text="test" />
+
+            </RelativeLayout>
+        </ScrollView>
+
+    </RelativeLayout>
+
+    <Button
+        android:id="@+id/bContinue"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="10dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginStart="20dp"
+        android:text="Verder" />
+
+</RelativeLayout>

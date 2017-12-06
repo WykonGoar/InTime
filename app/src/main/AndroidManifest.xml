@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.wykon.intime">
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/stop_watch"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity
+            android:name=".activity.MainActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/app_name"
+            android:theme="@style/FullscreenTheme" />
+        <activity
+            android:name=".activity.GameActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_game"
+            android:theme="@style/FullscreenTheme" />
+        <activity
+            android:name=".activity.ResultActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_result"
+            android:theme="@style/FullscreenTheme" />
+        <activity
+            android:name=".activity.TimeUpActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_time_up"
+            android:theme="@style/FullscreenTheme" />
+        <activity
+            android:name=".activity.RulesActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_rules"
+            android:theme="@style/FullscreenTheme" />
+    </application>
+
+    <uses-permission android:name="android.permission.VIBRATE"/>
+</manifest>

@@ -1,0 +1,31 @@
+<resources>
+    <string name="app_name">In Time</string>
+
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="surprise">Surprise</string>
+
+    <string name="title_activity_game">game</string>
+
+    <string name="title_activity_result">result</string>
+
+    <string name="title_activity_surprise_explenation">SurpriseExplenation</string>
+
+    <string name="title_activity_time_up">TimeUp</string>
+
+    <string name="title_activity_current_standing">CurrentStanding</string>
+
+    <string name="title_activity_end_surprise">EndSurprise</string>
+    <string name="EndSurprise">Gefeliciteerd!\n\nJe mag je cadeaus nu openen!\n\nJe refractometer komt helaas later.</string>
+    <string name="Surprise_explenation">Voordat je jouw cadeau mag openen moet je die eerst verdienen!\n\nHiervoor moet je eerst 20 woorden/zinnen door de rest van de familie laten raden. De regels hiervoor zijn hetzelfde als voor \"Half a minute\".</string>
+
+    <string name="title_activity_rules">Rules</string>
+    <string name="rules">\n
+        1.\nJe mag de woorden die op de kaart niet gebruiken. Lidwoorden mogen wel gebruikt worden.\n\n
+        2.\nJe mag de woorden niet beschrijven doormiddel van \"klinkt als...\" of \"rijmt op ...\"\n\n
+        3.\nJe mag niet naar letters verwijzen in het alfabet.Zoals \"Begint met de eerste letter van het alfabet.\"\n\n
+        4.\nJe mag niet wijzen naar objecten of personen.\n\n
+        5.\nJe mag geen vertalingen van de woorden gebruiken.\n\n
+        6.\nNadat de 30 seconden voorbij zijn mag er niet meer geraden worden.\n\n
+        7.\nAls je alle woorden goed heb, verdien je 1 punt extra.\n\n</string>
+</resources>

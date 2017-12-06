@@ -1,0 +1,3 @@
+CREATE TABLE `games` ( `win_points`   INTEGER,  `word_count`    INTEGER,   `score`   INTEGER,   `mode`   VARCHAR(255));
+CREATE TABLE `lists` ( 	`_id`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, 	`name`	VARCHAR (255)  NOT NULL,    `selected`   BOOLEAN    DEFAULT 0 );
+CREATE TABLE `words` (  `_id`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,  `word`	VARCHAR (255)  NOT NULL,    `used_location`   INTEGER   DEFAULT -1,   `list_id`    INTEGER    NOT NULL,  CONSTRAINT fk_list_id     FOREIGN KEY (list_id)     REFERENCES lists (_id)     ON DELETE CASCADE );
