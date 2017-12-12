@@ -3,23 +3,12 @@
 
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
-    <string name="surprise">Surprise</string>
 
     <string name="title_activity_game">game</string>
-
     <string name="title_activity_result">result</string>
-
-    <string name="title_activity_surprise_explenation">SurpriseExplenation</string>
-
     <string name="title_activity_time_up">TimeUp</string>
-
-    <string name="title_activity_current_standing">CurrentStanding</string>
-
-    <string name="title_activity_end_surprise">EndSurprise</string>
-    <string name="EndSurprise">Gefeliciteerd!\n\nJe mag je cadeaus nu openen!\n\nJe refractometer komt helaas later.</string>
-    <string name="Surprise_explenation">Voordat je jouw cadeau mag openen moet je die eerst verdienen!\n\nHiervoor moet je eerst 20 woorden/zinnen door de rest van de familie laten raden. De regels hiervoor zijn hetzelfde als voor \"Half a minute\".</string>
-
     <string name="title_activity_rules">Rules</string>
+
     <string name="rules">\n
         1.\nJe mag de woorden die op de kaart niet gebruiken. Lidwoorden mogen wel gebruikt worden.\n\n
         2.\nJe mag de woorden niet beschrijven doormiddel van \"klinkt als...\" of \"rijmt op ...\"\n\n
@@ -28,4 +17,42 @@
         5.\nJe mag geen vertalingen van de woorden gebruiken.\n\n
         6.\nNadat de 30 seconden voorbij zijn mag er niet meer geraden worden.\n\n
         7.\nAls je alle woorden goed heb, verdien je 1 punt extra.\n\n</string>
+
+    <string name="title_activity_settings">settings</string>
+
+    <string-array name="win_points">
+        <item>5</item>
+        <item>10</item>
+        <item>15</item>
+        <item>20</item>
+        <item>25</item>
+        <item>30</item>
+        <item>35</item>
+        <item>40</item>
+        <item>45</item>
+        <item>50</item>
+    </string-array>
+
+    <string-array name="word_count">
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+    </string-array>
+
+    <string-array name="planets_array">
+        <item>Mercury</item>
+        <item>Venus</item>
+        <item>Earth</item>
+        <item>Mars</item>
+        <item>Jupiter</item>
+        <item>Saturn</item>
+        <item>Uranus</item>
+        <item>Neptune</item>
+    </string-array>
+
+    <string name="title_activity_new_game">NewGame</string>
+
+    <string name="title_activity_team">Team</string>
+
+    <string name="title_activity_add_player">AddPlayer</string>
 </resources>

@@ -1,12 +1,14 @@
 package com.wykon.intime.activity;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ImageView;
 
 import com.wykon.intime.R;
 
@@ -122,6 +124,8 @@ public class RulesActivity extends AppCompatActivity {
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
     }
 
+    private ImageView ivHome;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -129,6 +133,21 @@ public class RulesActivity extends AppCompatActivity {
         setContentView(R.layout.activity_rules);
 
         mVisible = true;
+
+        ivHome = findViewById(R.id.ivHome);
+        ivHome.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent mIntent = new Intent(getApplicationContext(), MainActivity.class);
+                startActivity(mIntent);
+            }
+        });
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
     }
 
 }

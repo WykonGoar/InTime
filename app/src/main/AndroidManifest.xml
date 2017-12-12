@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.wykon.intime">
 
+    <uses-permission android:name="android.permission.VIBRATE" />
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/stop_watch"
@@ -13,7 +15,13 @@
             android:name=".activity.MainActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/app_name"
-            android:theme="@style/FullscreenTheme" />
+            android:theme="@style/FullscreenTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".activity.GameActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
@@ -34,7 +42,26 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_rules"
             android:theme="@style/FullscreenTheme" />
+        <activity
+            android:name=".activity.SettingsActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_settings"
+            android:theme="@style/FullscreenTheme" />
+        <activity
+            android:name=".activity.NewGameActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_new_game"
+            android:theme="@style/FullscreenTheme" />
+        <activity
+            android:name=".activity.TeamActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_team"
+            android:theme="@style/FullscreenTheme" />
+        <activity
+            android:name=".activity.PlayerActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_add_player"
+            android:theme="@style/FullscreenTheme"></activity>
     </application>
 
-    <uses-permission android:name="android.permission.VIBRATE"/>
 </manifest>

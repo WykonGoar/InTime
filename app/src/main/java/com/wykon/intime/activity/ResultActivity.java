@@ -170,12 +170,6 @@ public class ResultActivity extends AppCompatActivity {
         bContinue.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                int totalScore = mGame.getScore() + getNewPoints();
-                updateScore(totalScore);
-
-                System.out.println("Current score " + totalScore);
-                System.out.println("Current game " + mGame.getMode());
-
                 Intent mIntent = null;
 
                 startActivity(mIntent);
@@ -294,6 +288,12 @@ public class ResultActivity extends AppCompatActivity {
                 updateCheckedTextView(ctvWord6);
             }
         });
+    }
+
+
+    @Override
+    public void onBackPressed() {
+
     }
 
 }

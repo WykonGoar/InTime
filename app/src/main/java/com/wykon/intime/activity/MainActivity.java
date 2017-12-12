@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 
 import com.wykon.intime.R;
 import com.wykon.intime.model.DatabaseConnection;
@@ -126,9 +127,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private DatabaseConnection mDatabaseConnection;
-    private Button mLoadGame;
-    private Button mNewGame;
-    private Button mSettings;
+    private Button bLoadGame;
+    private Button bNewGame;
+    private Button bRules;
+    private ImageView ivSettings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -139,11 +141,36 @@ public class MainActivity extends AppCompatActivity {
 
         mDatabaseConnection = new DatabaseConnection(this);
 
-        mLoadGame = findViewById(R.id.bLoadGame);
-        mNewGame = findViewById(R.id.bNewGame);
-        mSettings = findViewById(R.id.bSettings);
+        bLoadGame = findViewById(R.id.bLoadGame);
+        bNewGame = findViewById(R.id.bNewGame);
+        bRules = findViewById(R.id.bRules);
+        ivSettings = findViewById(R.id.ivSettings);
 
-        mLoadGame.setVisibility(View.GONE);
+        bNewGame.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent mIntent = new Intent(getApplicationContext(), NewGameActivity.class);
+                startActivity(mIntent);
+            }
+        });
+
+        ivSettings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent mIntent = new Intent(getApplicationContext(), SettingsActivity.class);
+                startActivity(mIntent);
+            }
+        });
+
+        bRules.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent mIntent = new Intent(getApplicationContext(), RulesActivity.class);
+                startActivity(mIntent);
+            }
+        });
+
+        bLoadGame.setVisibility(View.GONE);
 
     }
 

@@ -2,23 +2,27 @@ package com.wykon.intime.activity;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.os.VibrationEffect;
-import android.os.Vibrator;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.wykon.intime.R;
+import com.wykon.intime.model.DatabaseConnection;
+import com.wykon.intime.model.Game;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  */
-public class TimeUpActivity extends AppCompatActivity {
+public class SettingsActivity extends AppCompatActivity {
     /**
      * Whether or not the system UI should be auto-hidden after
      * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
@@ -42,6 +46,7 @@ public class TimeUpActivity extends AppCompatActivity {
         @Override
         public void run() {
             // Delayed removal of status and navigation bar
+
         }
     };
     private final Runnable mShowPart2Runnable = new Runnable() {
@@ -126,33 +131,84 @@ public class TimeUpActivity extends AppCompatActivity {
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
     }
 
-    private Button bContinue;
+    private DatabaseConnection mDatabaseConnection;
+    private Game mGame;
+    private ImageView ivHome;
+    private Spinner sWinPoints;
+    private Spinner sWordCount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_time_up);
+        setContentView(R.layout.activity_settings);
 
         mVisible = true;
 
-        bContinue = findViewById(R.id.bContinue);
-        bContinue.setOnClickListener(new View.OnClickListener() {
+        mDatabaseConnection = new DatabaseConnection(this);
+        ivHome = findViewById(R.id.ivHome);
+        sWinPoints = findViewById(R.id.sWinPoints);
+        sWordCount = findViewById(R.id.sWordCount);
+
+        ivHome.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent mIntent = new Intent(getApplicationContext(), ResultActivity.class);
+                Intent mIntent = new Intent(getApplicationContext(), MainActivity.class);
                 startActivity(mIntent);
-                finish();
             }
         });
 
-        Vibrator v = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-        v.vibrate(1000);
+        ArrayAdapter<CharSequence> winPointsAdapter = ArrayAdapter.createFromResource(this,
+                R.array.win_points, android.R.layout.simple_dropdown_item_1line);
+        winPointsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        sWinPoints.setAdapter(winPointsAdapter);
 
+        ArrayAdapter<CharSequence> wordCountAdapter = ArrayAdapter.createFromResource(this,
+                R.array.word_count, android.R.layout.simple_dropdown_item_1line);
+        wordCountAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        sWordCount.setAdapter(wordCountAdapter);
+
+        mGame = mDatabaseConnection.getGame();
+        int winPointIndex = winPointsAdapter.getPosition("" + mGame.getWinPoints());
+        int wordCountIndex = wordCountAdapter.getPosition("" + mGame.getWordCount());
+
+        sWinPoints.setSelection(winPointIndex);
+        sWordCount.setSelection(wordCountIndex);
+
+        sWinPoints.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                int selectedWinPoints = Integer.parseInt(adapterView.getItemAtPosition(i).toString());
+                mGame.setWinPoints(selectedWinPoints);
+
+                mGame.save(mDatabaseConnection);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        sWordCount.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                int selectedWordCount = Integer.parseInt(adapterView.getItemAtPosition(i).toString());
+                mGame.setWordCount(selectedWordCount);
+
+                mGame.save(mDatabaseConnection);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
     }
 
     @Override
     public void onBackPressed() {
-
+        super.onBackPressed();
+        finish();
     }
 }

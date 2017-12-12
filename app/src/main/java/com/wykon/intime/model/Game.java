@@ -1,53 +1,54 @@
 package com.wykon.intime.model;
 
+import android.database.sqlite.SQLiteStatement;
+
+import java.io.Serializable;
+
 /**
  * Created by 52 on 29-11-2017.
  */
 
-public class Game {
+public class Game implements Serializable{
     private int mWordCount;
     private int mWinPoints;
-    private int mScore;
-    private String mMode;
 
-    public Game(){}
-
-    public Game(int wordCount, int winPoints, int score, String mode){
+    public Game(int wordCount, int winPoints){
         mWordCount = wordCount;
         mWinPoints = winPoints;
-        mScore = score;
-        mMode = mode;
     }
 
     public int getWordCount() {
         return mWordCount;
     }
 
-    public void setWordCount(int wordCount) {
-        this.mWordCount = wordCount;
-    }
-
     public int getWinPoints() {
         return mWinPoints;
     }
 
+    public void setWordCount(int wordCount) {
+        mWordCount = wordCount;
+    }
+
     public void setWinPoints(int winPoints) {
-        this.mWinPoints = winPoints;
+        mWinPoints = winPoints;
     }
 
-    public int getScore() {
-        return mScore;
+    public void save(DatabaseConnection databaseConnection){
+        String query = "UPDATE games SET win_points = ?, word_count = ?";
+
+        SQLiteStatement statement = databaseConnection.getNewStatement(query);
+        statement.bindLong(1, mWinPoints);
+        statement.bindLong(2
+                , mWordCount);
+
+        databaseConnection.executeNonReturn(statement);
     }
 
-    public void setScore(int score) {
-        this.mScore = score;
-    }
+    public void reset(DatabaseConnection databaseConnection){
+        String clearUsedWords = "UPDATE words SET used_location = null";
+        String clearScores = "UPDATE scores SET score = 0";
 
-    public String getMode() {
-        return mMode;
-    }
-
-    public void setMode(String mode) {
-        this.mMode = mode;
+        databaseConnection.executeNonReturn(clearUsedWords);
+        databaseConnection.executeNonReturn(clearScores);
     }
 }

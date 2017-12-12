@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Logger;
 
 /**
@@ -214,30 +215,17 @@ public class DatabaseConnection extends Activity {
             mCursor = executeReturn(query);
         } catch (SQLiteException e) {
             e.printStackTrace();
-            return new Game();
+            return null;
         }
         mCursor.moveToFirst();
 
-        System.out.println("loop cursor");
-        Game game = new Game();
         //winPoints
         int winPoints = mCursor.getInt(mCursor.getColumnIndex("win_points"));
         //wordCount
         int wordCount = mCursor.getInt(mCursor.getColumnIndex("word_count"));
-        //score
-        int score = mCursor.getInt(mCursor.getColumnIndex("score"));
-        //mode
-        String mode = mCursor.getString(mCursor.getColumnIndex("mode"));
-
-        System.out.println("set values of game");
-
-        game.setWinPoints(winPoints);
-        game.setWordCount(wordCount);
-        game.setScore(score);
-        game.setMode(mode);
 
         mDatabase.close();
-        return game;
+        return new Game(wordCount, winPoints);
     }
 
     public LinkedList<Word> getUsedWords(){
@@ -250,13 +238,97 @@ public class DatabaseConnection extends Activity {
         executeNonReturn(query);
     }
 
-    public void resetGame(){
-        String clearGameQuery = "UPDATE games SET score = 0";
-        String clearUsedWords = "UPDATE words SET used_location = null";
+    public String[] getNames(){
+        Cursor mCursor = null;
 
-        executeNonReturn(clearGameQuery);
-        executeNonReturn(clearUsedWords);
+        try {
+            mCursor = executeReturn("SELECT * FROM names ORDER BY name");
+        } catch (SQLiteException e) {
+            e.printStackTrace();
+            return new String[0];
+        }
+        mCursor.moveToFirst();
 
+        List<String> names = new LinkedList<String>();
+
+        while(!mCursor.isAfterLast()){
+            //Name
+            String name = mCursor.getString(mCursor.getColumnIndex("name"));
+
+            names.add(name);
+
+            mCursor.moveToNext();
+        }
+
+        mDatabase.close();
+        return names.toArray(new String[0]);
+    }
+
+    public LinkedList<Team> getTeams(){
+        String query = "SELECT * FROM teams";
+
+        Cursor mCursor = null;
+        try {
+            mCursor = executeReturn(query);
+        } catch (SQLiteException e) {
+            e.printStackTrace();
+            return new LinkedList<>();
+        }
+
+        mCursor.moveToFirst();
+
+        LinkedList<Team> teams = new LinkedList<>();
+
+        while(!mCursor.isAfterLast()){
+            //Id
+            int id = mCursor.getInt(mCursor.getColumnIndex("_id"));
+            //name
+            String name = mCursor.getString(mCursor.getColumnIndex("name"));
+
+            String playerQuery = "SELECT * FROM players WHERE team_id == " + id + "";
+            LinkedList<Player> players = getPlayers(playerQuery);
+
+            Team team = new Team(id, name, players);
+
+            teams.add(team);
+
+            mCursor.moveToNext();
+        }
+
+        mDatabase.close();
+
+        return teams;
+
+    }
+
+    public LinkedList<Player> getPlayers(String query)
+    {
+        Cursor mCursor = null;
+
+        try {
+            mCursor = executeReturn(query);
+        } catch (SQLiteException e) {
+            e.printStackTrace();
+            return new LinkedList<>();
+        }
+        mCursor.moveToFirst();
+
+        LinkedList<Player> players = new LinkedList<>();
+
+        while(!mCursor.isAfterLast()){
+            //id
+            int id = mCursor.getInt(mCursor.getColumnIndex("_id"));
+            //name
+            String name = mCursor.getString(mCursor.getColumnIndex("name"));
+
+            Player player = new Player(id, name);
+            players.add(player);
+
+            mCursor.moveToNext();
+        }
+
+        mDatabase.close();
+        return players;
     }
 }
 

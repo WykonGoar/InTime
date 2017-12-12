@@ -188,7 +188,6 @@ public class GameActivity extends AppCompatActivity {
                 }
 
                 Intent mIntent = new Intent(getApplicationContext(), TimeUpActivity.class);
-
                 startActivity(mIntent);
                 finish();
             }
@@ -255,5 +254,10 @@ public class GameActivity extends AppCompatActivity {
             statement.bindLong(2, word.getId());
             mDatabaseConnection.executeNonReturn(statement);
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+
     }
 }

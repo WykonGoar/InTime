@@ -1,24 +1,36 @@
 package com.wykon.intime.activity;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
-import android.os.VibrationEffect;
-import android.os.Vibrator;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
+import android.widget.AdapterView;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.wykon.intime.R;
+import com.wykon.intime.adapter.PlayerListAdapter;
+import com.wykon.intime.adapter.TeamListAdapter;
+import com.wykon.intime.model.DatabaseConnection;
+import com.wykon.intime.model.Game;
+import com.wykon.intime.model.Player;
+import com.wykon.intime.model.Team;
+
+import java.util.List;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  */
-public class TimeUpActivity extends AppCompatActivity {
+public class NewGameActivity extends AppCompatActivity {
     /**
      * Whether or not the system UI should be auto-hidden after
      * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
@@ -126,33 +138,108 @@ public class TimeUpActivity extends AppCompatActivity {
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
     }
 
-    private Button bContinue;
+    private int ADD_TEAM_ID = 1;
+    private int UPDATE_TEAM_ID = 2;
+
+    private Context mContext;
+    private DatabaseConnection mDatabaseConnection;
+    private Game mGame;
+    private ImageView ivHome;
+    private TextView tvWinPoints;
+    private TextView tvWordCount;
+    private ListView lvTeams;
+    private TeamListAdapter mTeamsAdapter;
+    private ImageView ivAddTeam;
+
+    private List<Team> mTeams;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_time_up);
+        setContentView(R.layout.activity_new_game);
 
         mVisible = true;
+        mContext = this;
 
-        bContinue = findViewById(R.id.bContinue);
-        bContinue.setOnClickListener(new View.OnClickListener() {
+        mDatabaseConnection = new DatabaseConnection(this);
+        mGame = mDatabaseConnection.getGame();
+
+        ivHome = findViewById(R.id.ivHome);
+        tvWinPoints = findViewById(R.id.tvWinPoints);
+        tvWordCount = findViewById(R.id.tvWordCount);
+        lvTeams = findViewById(R.id.lvTeams);
+        ivAddTeam = findViewById(R.id.ivAddTeam);
+
+        tvWinPoints.setText("" + mGame.getWinPoints());
+        tvWordCount.setText("" + mGame.getWordCount());
+
+        ivHome.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent mIntent = new Intent(getApplicationContext(), ResultActivity.class);
+                Intent mIntent = new Intent(getApplicationContext(), MainActivity.class);
                 startActivity(mIntent);
-                finish();
             }
         });
 
-        Vibrator v = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-        v.vibrate(1000);
+        ivAddTeam.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent mIntent = new Intent(getApplicationContext(), TeamActivity.class);
+                startActivityForResult(mIntent, ADD_TEAM_ID);
+            }
+        });
 
+        lvTeams.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                Team team = (Team) mTeamsAdapter.getItem(position);
+
+                Intent mIntent = new Intent(getApplicationContext(), TeamActivity.class);
+                mIntent.putExtra("Team", team);
+                startActivityForResult(mIntent, UPDATE_TEAM_ID);
+            }
+        });
+
+        LoadTeams();
+    }
+
+    private void LoadTeams(){
+        mTeams = mDatabaseConnection.getTeams();
+
+        mTeamsAdapter = new TeamListAdapter(this, mDatabaseConnection, mTeams);
+        lvTeams.setAdapter(mTeamsAdapter);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == ADD_TEAM_ID){
+            if (resultCode == RESULT_OK){
+                Team team = (Team) data.getSerializableExtra("Team");
+
+                mTeams.add(team);
+                mTeamsAdapter.notifyDataSetChanged();
+            }
+        }
+
+        if (requestCode == UPDATE_TEAM_ID){
+            if (resultCode == RESULT_OK){
+                Team updatedTeam = (Team) data.getSerializableExtra("Team");
+                for (Team team : mTeams){
+                    if (team.getId() == updatedTeam.getId()){
+                        team.setName(updatedTeam.getName());
+                        team.setPlayers(updatedTeam.getPlayers());
+                        break;
+                    }
+                }
+                mTeamsAdapter.notifyDataSetChanged();
+            }
+        }
     }
 
     @Override
     public void onBackPressed() {
-
+        super.onBackPressed();
+        finish();
     }
 }
