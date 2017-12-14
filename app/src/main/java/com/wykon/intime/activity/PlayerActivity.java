@@ -139,6 +139,7 @@ public class PlayerActivity extends AppCompatActivity {
     private EditText etName;
     private Spinner sNames;
     private Button bAdd;
+    private boolean calledByOnCreate = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -158,7 +159,7 @@ public class PlayerActivity extends AppCompatActivity {
         bAdd = findViewById(R.id.bAdd);
 
         ArrayAdapter<String> winPointsAdapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_dropdown_item_1line, mDatabaseConnection.getNames());
+                android.R.layout.simple_dropdown_item_1line, mDatabaseConnection.getFavorites());
         winPointsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         sNames.setAdapter(winPointsAdapter);
 
@@ -166,7 +167,13 @@ public class PlayerActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 String name = adapterView.getItemAtPosition(i).toString();
-                etName.setText(name);
+
+                if (!calledByOnCreate) {
+                    calledByOnCreate = true;
+                    return;
+                }
+
+                returnPlayer(name);
             }
 
             @Override
@@ -184,20 +191,24 @@ public class PlayerActivity extends AppCompatActivity {
                     return;
                 }
 
-                for (Player player: mTeam.getPlayers()){
-                    if (player.getName().equals(name)){
-                        Toast.makeText(mContext, "Speler met de naam '" + name + "' zit al in het team", Toast.LENGTH_LONG).show();
-                        return;
-                    }
-                }
-
-                Intent result = new Intent();
-                result.putExtra("Name", name);
-                setResult(RESULT_OK, result);
-                finish();
+                returnPlayer(name);
             }
         });
 
         etName.setText("");
+    }
+
+    private void returnPlayer(String name){
+        for (Player player: mTeam.getPlayers()){
+            if (player.getName().equals(name)){
+                Toast.makeText(mContext, "Speler met de naam '" + name + "' zit al in het team", Toast.LENGTH_LONG).show();
+                return;
+            }
+        }
+
+        Intent result = new Intent();
+        result.putExtra("Name", name);
+        setResult(RESULT_OK, result);
+        finish();
     }
 }

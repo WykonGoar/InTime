@@ -55,4 +55,6 @@
     <string name="title_activity_team">Team</string>
 
     <string name="title_activity_add_player">AddPlayer</string>
+
+    <string name="title_activity_favorites">favorites</string>
 </resources>

@@ -8,4 +8,4 @@ INSERT INTO words (word, list_id) VALUES ("SNES mini", 1), ("Zelda", 1), ("Wind 
 INSERT INTO words (word, list_id) VALUES ("1 november 2016", 1), ("Shannon song", 1), ("30 jaar", 1), ("Price Cleaning", 1), ("Raayland", 1), ("Bronckhorster", 1), ("Hertog Jan", 1), ("Barleywine", 1);
 INSERT INTO words (word, list_id) VALUES ("Põhjala", 1), ("Stout", 1), ("Straffe Hendrik", 1), ("Jopen", 1), ("Kruistocht Van Thomas", 1), ("kwestie van geduld", 1), ("Heilige hopjes", 1), ("HOnNEbrUW", 1);
 INSERT INTO words (word, list_id) VALUES ("Blond Om Van Te Houwen", 1), ("Tripel", 1), ("Dubbel", 1), ("Blond", 1), ("Kelk", 1), ("Water en wijn", 1), ("Doctor Who", 1), ("Suits", 1), ("The Good Place", 1);
-INSERT INTO names (name) VALUES ("Wouter"), ("Sylvia"), ("José"), ("Martien"), ("Martijn"), ("Jesper"), ("Marcia");
+INSERT INTO favorites (name) VALUES ("Wouter"), ("Sylvia"), ("José"), ("Martien"), ("Martijn"), ("Jesper"), ("Marcia"), ("Maris"), ("Thea");

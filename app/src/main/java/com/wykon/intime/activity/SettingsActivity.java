@@ -10,6 +10,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -136,6 +137,8 @@ public class SettingsActivity extends AppCompatActivity {
     private ImageView ivHome;
     private Spinner sWinPoints;
     private Spinner sWordCount;
+    private Button bWords;
+    private Button bFavorites;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -149,6 +152,8 @@ public class SettingsActivity extends AppCompatActivity {
         ivHome = findViewById(R.id.ivHome);
         sWinPoints = findViewById(R.id.sWinPoints);
         sWordCount = findViewById(R.id.sWordCount);
+        bWords = findViewById(R.id.bWords);
+        bFavorites = findViewById(R.id.bFavorites);
 
         ivHome.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -202,6 +207,14 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {
 
+            }
+        });
+
+        bFavorites.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent mIntent = new Intent(getApplicationContext(), FavoritesActivity.class);
+                startActivity(mIntent);
             }
         });
     }

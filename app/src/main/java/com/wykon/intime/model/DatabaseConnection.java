@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.logging.Logger;
 
 /**
@@ -65,7 +64,7 @@ public class DatabaseConnection extends Activity {
     private void importWordLists(){
         try {
             System.out.println("IMPORT WORD LISTS");
-            InputStream mInputStream = mContext.getAssets().open("NewWordLists.sql");
+            InputStream mInputStream = mContext.getAssets().open("NewValues.sql");
 
             BufferedReader mBufferedReader = new BufferedReader(new InputStreamReader(mInputStream));
 
@@ -238,18 +237,18 @@ public class DatabaseConnection extends Activity {
         executeNonReturn(query);
     }
 
-    public String[] getNames(){
+    public LinkedList<String> getFavorites(){
         Cursor mCursor = null;
 
         try {
-            mCursor = executeReturn("SELECT * FROM names ORDER BY name");
+            mCursor = executeReturn("SELECT * FROM favorites ORDER BY name");
         } catch (SQLiteException e) {
             e.printStackTrace();
-            return new String[0];
+            return new LinkedList<>();
         }
         mCursor.moveToFirst();
 
-        List<String> names = new LinkedList<String>();
+        LinkedList<String> names = new LinkedList<String>();
 
         while(!mCursor.isAfterLast()){
             //Name
@@ -261,7 +260,7 @@ public class DatabaseConnection extends Activity {
         }
 
         mDatabase.close();
-        return names.toArray(new String[0]);
+        return names;
     }
 
     public LinkedList<Team> getTeams(){

@@ -1,8 +1,9 @@
 package com.wykon.intime.activity;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
-import android.content.Intent;
+import android.content.DialogInterface;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,18 +17,16 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.wykon.intime.R;
-import com.wykon.intime.adapter.PlayerListAdapter;
+import com.wykon.intime.adapter.FavoriteListAdapter;
 import com.wykon.intime.model.DatabaseConnection;
-import com.wykon.intime.model.Player;
-import com.wykon.intime.model.Team;
 
-import java.util.List;
+import java.util.LinkedList;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  */
-public class TeamActivity extends AppCompatActivity {
+public class FavoritesActivity extends AppCompatActivity {
     /**
      * Whether or not the system UI should be auto-hidden after
      * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
@@ -135,93 +134,91 @@ public class TeamActivity extends AppCompatActivity {
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
     }
 
-    private int ADD_PLAYER_ID = 1;
+    private int ADD_FAVORITE_ID = 1;
 
     private Context mContext;
     private DatabaseConnection mDatabaseConnection;
-    private Team mTeam;
-    private EditText etName;
-    private ImageView ivAddPlayer;
-    private ListView lvPlayers;
-    private PlayerListAdapter mPlayersAdapter;
+    private ImageView ivAddFavorite;
+    private ListView lvFavorites;
+    private FavoriteListAdapter mFavoritesAdapter;
     private Button bSave;
+
+    private LinkedList<String> mFavorites;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_team);
+        setContentView(R.layout.activity_favorites);
 
         mVisible = true;
 
         mContext = this;
         mDatabaseConnection = new DatabaseConnection(this);
 
-        Intent mIntent = getIntent();
-        if(mIntent.hasExtra("Team")){
-            mTeam = (Team) mIntent.getSerializableExtra("Team");
-        }
-        else {
-            mTeam = new Team();
-        }
-
-        etName = findViewById(R.id.etName);
-        ivAddPlayer = findViewById(R.id.ivAddPlayer);
-        lvPlayers = findViewById(R.id.lvPlayers);
+        ivAddFavorite = findViewById(R.id.ivAddFavorite);
+        lvFavorites = findViewById(R.id.lvFavorites);
         bSave = findViewById(R.id.bSave);
 
-        etName.setText(mTeam.getName());
+        mFavorites = mDatabaseConnection.getFavorites();
+        mFavoritesAdapter = new FavoriteListAdapter(this, mFavorites);
+        lvFavorites.setAdapter(mFavoritesAdapter);
 
-        ivAddPlayer.setOnClickListener(new View.OnClickListener() {
+        ivAddFavorite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-            Intent mIntent = new Intent(getApplicationContext(), PlayerActivity.class);
-            mIntent.putExtra("Team", mTeam);
+                AlertDialog.Builder addName = new AlertDialog.Builder(mContext);
+                addName.setMessage("Naam aanpassen");
 
-            startActivityForResult(mIntent, ADD_PLAYER_ID);
+                // Set up the input
+                final EditText input = new EditText(view.getContext());
+                addName.setView(input);
+
+                addName.setPositiveButton("Ja", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        String newName = input.getText().toString();
+                        if (newName.equals(""))
+                            return;
+
+                        for (String favorite: mFavorites){
+                            if (favorite.equals(newName)){
+                                Toast.makeText(mContext, "'" + newName + "' zit al in de favorieten", Toast.LENGTH_LONG).show();
+                                return;
+                            }
+                        }
+
+                        mFavorites.add(newName);
+
+                        mFavoritesAdapter.notifyDataSetChanged();
+                    }
+                });
+
+                addName.setNegativeButton("Annuleer", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                    }
+                });
+
+                addName.create().show();
             }
         });
 
         bSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String name = etName.getText().toString();
-                if (name.equals("")){
-                    Toast.makeText(mContext, "Geen naam ingevuld", Toast.LENGTH_LONG).show();
-                    return;
+                // Remove current favorites
+                mDatabaseConnection.executeNonReturn("DELETE FROM favorites");
+
+                String favoritesList = "";
+                for (String favorite: mFavorites){
+                    favoritesList += ", ('" + favorite + "')";
                 }
+                String insertQuery = "INSERT INTO favorites(name) VALUES " + favoritesList.substring(1);
+                mDatabaseConnection.executeNonReturn(insertQuery);
 
-                for (Team team : mDatabaseConnection.getTeams()){
-                    if (team.getId() != mTeam.getId() && team.getName().equals(name)){
-                        Toast.makeText(mContext, "Team met de naam '" + name + "' bestaat al", Toast.LENGTH_LONG).show();
-                        return;
-                    }
-                }
-
-                mTeam.setName(name);
-                mTeam.save(mDatabaseConnection);
-
-                Intent result = new Intent();
-                result.putExtra("Team", mTeam);
-                setResult(RESULT_OK, result);
                 finish();
-                }
-        });
-
-        mPlayersAdapter = new PlayerListAdapter(this, mTeam.getPlayers());
-        lvPlayers.setAdapter(mPlayersAdapter);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == ADD_PLAYER_ID){
-            if (resultCode == RESULT_OK){
-                String name = data.getStringExtra("Name");
-
-                List<Player> players = mTeam.getPlayers();
-                players.add(new Player(name));
-                mPlayersAdapter.notifyDataSetChanged();
             }
-        }
+        });
     }
 }

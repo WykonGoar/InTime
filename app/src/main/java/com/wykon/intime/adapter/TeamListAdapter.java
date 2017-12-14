@@ -65,7 +65,7 @@ public class TeamListAdapter extends BaseAdapter {
             @Override
             public void onClick(View view) {
                 AlertDialog.Builder confirm = new AlertDialog.Builder(mContext);
-                confirm.setMessage("Weet je zeker dat je " + team.getName() + " wilt verwijderen?");
+                confirm.setMessage("Weet je zeker dat je '" + team.getName() + "' wilt verwijderen?");
 
                 confirm.setPositiveButton("Ja", new DialogInterface.OnClickListener() {
                     @Override

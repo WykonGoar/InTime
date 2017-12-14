@@ -10,7 +10,6 @@ import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.wykon.intime.R;
 import com.wykon.intime.model.Player;
@@ -20,29 +19,29 @@ import java.util.List;
 /**
  * Created by Wouter on 16-11-2015.
  */
-public class PlayerListAdapter extends BaseAdapter {
+public class FavoriteListAdapter extends BaseAdapter {
 
     private Context mContext;
-    private List<Player> mPlayers;
+    private List<String> mFavorites;
 
-    public PlayerListAdapter(Context context, List<Player> players) {
+    public FavoriteListAdapter(Context context, List<String> favorites) {
         mContext = context;
-        mPlayers = players;
+        mFavorites = favorites;
     }
 
     @Override
     public int getCount() {
-        return mPlayers.size();
+        return mFavorites.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return mPlayers.get(position);
+        return mFavorites.get(position);
     }
 
     @Override
     public long getItemId(int position) {
-        return mPlayers.indexOf(getItem(position));
+        return mFavorites.indexOf(getItem(position));
     }
 
     @Override
@@ -54,19 +53,19 @@ public class PlayerListAdapter extends BaseAdapter {
         TextView tvName = rowView.findViewById(R.id.tvName);
         ImageView ivDelete = rowView.findViewById(R.id.ivDelete);
 
-        final Player player = mPlayers.get(position);
-        tvName.setText(player.getName());
+        final String favorite = mFavorites.get(position);
+        tvName.setText(favorite);
 
         ivDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 AlertDialog.Builder confirm = new AlertDialog.Builder(mContext);
-                confirm.setMessage("Weet je zeker dat je '" + player.getName() + "' wilt verwijderen?");
+                confirm.setMessage("Weet je zeker dat je '" + favorite + "' wilt verwijderen?");
 
                 confirm.setPositiveButton("Ja", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        mPlayers.remove(position);
+                        mFavorites.remove(position);
                         notifyDataSetChanged();
                     }
                 });
@@ -90,7 +89,7 @@ public class PlayerListAdapter extends BaseAdapter {
 
                 // Set up the input
                 final EditText input = new EditText(view.getContext());
-                input.setText(player.getName());
+                input.setText(favorite);
                 editName.setView(input);
 
                 editName.setPositiveButton("Ja", new DialogInterface.OnClickListener() {
@@ -100,16 +99,9 @@ public class PlayerListAdapter extends BaseAdapter {
                         if (newName.equals(""))
                             return;
 
-                        for (Player player: mPlayers){
-                            if (player.getName().equals(newName)){
-                                Toast.makeText(mContext, "Speler met de naam '" + newName + "' zit al in het team", Toast.LENGTH_LONG).show();
-                                return;
-                            }
-                        }
-
-                        mPlayers.remove(position);
-                        mPlayers.add(position, new Player(newName));
-
+                        mFavorites.remove(position);
+                        mFavorites.add(position, favorite);
+                        
                         notifyDataSetChanged();
                     }
                 });

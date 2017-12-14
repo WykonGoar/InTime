@@ -87,7 +87,7 @@
         android:text="Woorden" />
 
     <Button
-        android:id="@+id/button2"
+        android:id="@+id/bFavorites"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginEnd="20dp"
