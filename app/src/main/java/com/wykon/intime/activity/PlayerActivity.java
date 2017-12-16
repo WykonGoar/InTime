@@ -186,6 +186,7 @@ public class PlayerActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 String name = etName.getText().toString();
+                name = name.trim();
                 if (name.equals("")){
                     Toast.makeText(mContext, "Geen naam ingevuld", Toast.LENGTH_LONG).show();
                     return;
@@ -209,6 +210,12 @@ public class PlayerActivity extends AppCompatActivity {
         Intent result = new Intent();
         result.putExtra("Name", name);
         setResult(RESULT_OK, result);
+        finish();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
         finish();
     }
 }

@@ -49,7 +49,7 @@ public class PlayerListAdapter extends BaseAdapter {
     public View getView(final int position, View convertView, ViewGroup parent) {
 
         LayoutInflater mLayoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View rowView = mLayoutInflater.inflate(R.layout.row_player, parent, false);
+        View rowView = mLayoutInflater.inflate(R.layout.row_name, parent, false);
 
         TextView tvName = rowView.findViewById(R.id.tvName);
         ImageView ivDelete = rowView.findViewById(R.id.ivDelete);
@@ -71,7 +71,7 @@ public class PlayerListAdapter extends BaseAdapter {
                     }
                 });
 
-                confirm.setNegativeButton("Nee", new DialogInterface.OnClickListener() {
+                confirm.setNegativeButton("Annuleer", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                     }
@@ -97,11 +97,16 @@ public class PlayerListAdapter extends BaseAdapter {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         String newName = input.getText().toString();
+                        newName = newName.trim();
                         if (newName.equals(""))
                             return;
 
-                        for (Player player: mPlayers){
-                            if (player.getName().equals(newName)){
+                        for (int index = 0; index < mPlayers.size(); index++){
+                            if (index == position)
+                                continue;
+
+                            Player iPlayer = mPlayers.get(index);
+                            if (iPlayer.getName().equals(newName)){
                                 Toast.makeText(mContext, "Speler met de naam '" + newName + "' zit al in het team", Toast.LENGTH_LONG).show();
                                 return;
                             }

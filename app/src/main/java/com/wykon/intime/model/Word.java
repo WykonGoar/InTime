@@ -45,7 +45,7 @@ public class Word implements Serializable{
     }
 
     public void save(DatabaseConnection databaseConnection){
-        String query = "UPDATE groups SET name = ? WHERE _id = ?";
+        String query = "UPDATE words SET word = ? WHERE _id = ?";
 
         SQLiteStatement statement = databaseConnection.getNewStatement(query);
         statement.bindString(1, mWord);
@@ -55,7 +55,7 @@ public class Word implements Serializable{
     }
 
     public void insert(DatabaseConnection databaseConnection, int list_id){
-        String query = "INSERT INTO words(name, list_id) VALUES(?);";
+        String query = "INSERT INTO words(word, list_id) VALUES(?, ?);";
 
         SQLiteStatement statement = databaseConnection.getNewStatement(query);
         statement.bindString(1, mWord);

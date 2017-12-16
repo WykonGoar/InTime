@@ -13,35 +13,36 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wykon.intime.R;
+import com.wykon.intime.model.Word;
 
 import java.util.List;
 
 /**
  * Created by Wouter on 16-11-2015.
  */
-public class FavoriteListAdapter extends BaseAdapter {
+public class WordAdapter extends BaseAdapter {
 
     private Context mContext;
-    private List<String> mFavorites;
+    private List<Word> mWords;
 
-    public FavoriteListAdapter(Context context, List<String> favorites) {
+    public WordAdapter(Context context, List<Word> word) {
         mContext = context;
-        mFavorites = favorites;
+        mWords = word;
     }
 
     @Override
     public int getCount() {
-        return mFavorites.size();
+        return mWords.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return mFavorites.get(position);
+        return mWords.get(position);
     }
 
     @Override
     public long getItemId(int position) {
-        return mFavorites.indexOf(getItem(position));
+        return mWords.indexOf(getItem(position));
     }
 
     @Override
@@ -53,19 +54,19 @@ public class FavoriteListAdapter extends BaseAdapter {
         TextView tvName = rowView.findViewById(R.id.tvName);
         ImageView ivDelete = rowView.findViewById(R.id.ivDelete);
 
-        final String favorite = mFavorites.get(position);
-        tvName.setText(favorite);
+        final Word word = mWords.get(position);
+        tvName.setText(word.getWord());
 
         ivDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 AlertDialog.Builder confirm = new AlertDialog.Builder(mContext);
-                confirm.setMessage("Weet je zeker dat je '" + favorite + "' wilt verwijderen?");
+                confirm.setMessage("Weet je zeker dat je '" + word.getWord() + "' wilt verwijderen?");
 
                 confirm.setPositiveButton("Ja", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        mFavorites.remove(position);
+                        mWords.remove(position);
                         notifyDataSetChanged();
                     }
                 });
@@ -85,36 +86,34 @@ public class FavoriteListAdapter extends BaseAdapter {
             public void onClick(View view) {
 
                 AlertDialog.Builder editName = new AlertDialog.Builder(mContext);
-                editName.setMessage("Naam aanpassen");
+                editName.setMessage("Woord aanpassen");
 
                 // Set up the input
                 final EditText input = new EditText(view.getContext());
-                input.setText(favorite);
+                input.setText(word.getWord());
                 editName.setView(input);
 
                 editName.setPositiveButton("Ja", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        String newName = input.getText().toString();
-                        newName = newName.trim();
-                        if (newName.equals(""))
+                        String newWord = input.getText().toString();
+                        newWord = newWord.trim();
+                        if (newWord.equals(""))
                             return;
 
-                        for(int index = 0; index < mFavorites.size(); index ++)
+                        for(int index = 0; index < mWords.size(); index ++)
                         {
                             if (index == position)
                                 continue;
 
-                            String iFavorite = mFavorites.get(index);
-                            if (iFavorite.equals(newName)){
-                                Toast.makeText(mContext, "'" + newName + "' is al toegevoegd", Toast.LENGTH_LONG).show();
+                            Word iWord = mWords.get(index);
+                            if (iWord.getWord().equals(newWord)){
+                                Toast.makeText(mContext, "'" + newWord + "' is al toegevoegd", Toast.LENGTH_LONG).show();
                                 return;
                             }
                         }
 
-                        mFavorites.remove(position);
-                        mFavorites.add(position, favorite);
-                        
+                        word.setWord(newWord);
                         notifyDataSetChanged();
                     }
                 });

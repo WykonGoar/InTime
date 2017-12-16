@@ -1,77 +1,81 @@
 package com.wykon.intime.adapter;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.wykon.intime.R;
+import com.wykon.intime.activity.WordListsActivity;
 import com.wykon.intime.model.DatabaseConnection;
-import com.wykon.intime.model.Player;
-import com.wykon.intime.model.Team;
+import com.wykon.intime.model.WordList;
 
 import java.util.List;
 
 /**
  * Created by Wouter on 16-11-2015.
  */
-public class TeamListAdapter extends BaseAdapter {
+public class WordListAdapter extends BaseAdapter {
 
-    private Context mContext;
+    private WordListsActivity mContext;
     private DatabaseConnection mDatabaseConnection;
-    private List<Team> mTeams;
+    private List<WordList> mWordLists;
 
-    public TeamListAdapter(Context context, DatabaseConnection databaseConnection, List<Team> teams) {
+    public WordListAdapter(WordListsActivity context, List<WordList> wordLists) {
         mContext = context;
-        mDatabaseConnection = databaseConnection;
-        mTeams = teams;
+        mWordLists = wordLists;
+        mDatabaseConnection = new DatabaseConnection(context);
     }
 
     @Override
     public int getCount() {
-        return mTeams.size();
+        return mWordLists.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return mTeams.get(position);
+        return mWordLists.get(position);
     }
 
     @Override
     public long getItemId(int position) {
-        return mTeams.indexOf(getItem(position));
+        return mWordLists.indexOf(getItem(position));
     }
 
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
 
         LayoutInflater mLayoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View rowView = mLayoutInflater.inflate(R.layout.row_team, parent, false);
+        View rowView = mLayoutInflater.inflate(R.layout.row_word_list, parent, false);
 
         TextView tvName = rowView.findViewById(R.id.tvName);
-        TextView tvPlayersCount = rowView.findViewById(R.id.tvPlayersCount);
+        final CheckBox cbSelected = rowView.findViewById(R.id.cbSelected);
         ImageView ivDelete = rowView.findViewById(R.id.ivDelete);
 
-        final Team team = mTeams.get(position);
-        tvName.setText(team.getName());
-        tvPlayersCount.setText(team.getPlayers().size() + " spelers");
+        final WordList wordList = mWordLists.get(position);
+        cbSelected.setChecked(wordList.isSelected());
+        tvName.setText(wordList.getName());
 
         ivDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 AlertDialog.Builder confirm = new AlertDialog.Builder(mContext);
-                confirm.setMessage("Weet je zeker dat je '" + team.getName() + "' wilt verwijderen?");
+                confirm.setMessage("Weet je zeker dat je '" + wordList.getName() + "' wilt verwijderen?");
 
                 confirm.setPositiveButton("Ja", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        mTeams.remove(position);
-                        team.delete(mDatabaseConnection);
+                        mWordLists.remove(position);
+                        wordList.delete(mDatabaseConnection);
                         notifyDataSetChanged();
                     }
                 });
@@ -83,6 +87,27 @@ public class TeamListAdapter extends BaseAdapter {
                 });
 
                 confirm.create().show();
+            }
+        });
+
+        tvName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mContext.onEditWordListClick(wordList);
+            }
+        });
+
+        cbSelected.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                boolean newChecked = cbSelected.isChecked();
+
+                System.out.println("new checked = " + newChecked);
+
+                cbSelected.setChecked(newChecked);
+                wordList.setSelected(newChecked);
+                wordList.save(mDatabaseConnection);
+                notifyDataSetChanged();
             }
         });
 

@@ -172,6 +172,9 @@ public class TeamActivity extends AppCompatActivity {
 
         etName.setText(mTeam.getName());
 
+        mPlayersAdapter = new PlayerListAdapter(this, mTeam.getPlayers());
+        lvPlayers.setAdapter(mPlayersAdapter);
+
         ivAddPlayer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -186,6 +189,7 @@ public class TeamActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 String name = etName.getText().toString();
+                name = name.trim();
                 if (name.equals("")){
                     Toast.makeText(mContext, "Geen naam ingevuld", Toast.LENGTH_LONG).show();
                     return;
@@ -207,9 +211,6 @@ public class TeamActivity extends AppCompatActivity {
                 finish();
                 }
         });
-
-        mPlayersAdapter = new PlayerListAdapter(this, mTeam.getPlayers());
-        lvPlayers.setAdapter(mPlayersAdapter);
     }
 
     @Override

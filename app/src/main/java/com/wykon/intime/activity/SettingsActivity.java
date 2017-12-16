@@ -210,6 +210,14 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
+        bWords.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent mIntent = new Intent(getApplicationContext(), WordListsActivity.class);
+                startActivity(mIntent);
+            }
+        });
+
         bFavorites.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

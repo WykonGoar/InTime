@@ -18,16 +18,16 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.wykon.intime.R;
-import com.wykon.intime.adapter.FavoriteListAdapter;
+import com.wykon.intime.adapter.WordAdapter;
 import com.wykon.intime.model.DatabaseConnection;
-
-import java.util.LinkedList;
+import com.wykon.intime.model.Word;
+import com.wykon.intime.model.WordList;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  */
-public class FavoritesActivity extends AppCompatActivity {
+public class WordListActivity extends AppCompatActivity {
     /**
      * Whether or not the system UI should be auto-hidden after
      * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
@@ -137,48 +137,53 @@ public class FavoritesActivity extends AppCompatActivity {
 
     private Context mContext;
     private DatabaseConnection mDatabaseConnection;
-    private ImageView ivHome;
-    private ImageView ivAddFavorite;
-    private ListView lvFavorites;
-    private FavoriteListAdapter mFavoritesAdapter;
+    private WordList mWordList;
+    private EditText etName;
+    private ImageView ivAddWord;
+    private ListView lvWords;
+    private WordAdapter mWordAdapter;
     private Button bSave;
-
-    private LinkedList<String> mFavorites;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_favorites);
+        setContentView(R.layout.activity_word_list);
 
         mVisible = true;
 
         mContext = this;
         mDatabaseConnection = new DatabaseConnection(this);
 
-        ivHome = findViewById(R.id.ivHome);
-        ivAddFavorite = findViewById(R.id.ivAddFavorite);
-        lvFavorites = findViewById(R.id.lvFavorites);
+        Intent mIntent = getIntent();
+        if(mIntent.hasExtra("WordList")){
+            mWordList = (WordList) mIntent.getSerializableExtra("WordList");
+        }
+        else {
+            mWordList = new WordList();
+        }
+
+        etName = findViewById(R.id.etName);
+        ivAddWord = findViewById(R.id.ivAddWord);
+        lvWords = findViewById(R.id.lvWords);
         bSave = findViewById(R.id.bSave);
 
-        mFavorites = mDatabaseConnection.getFavorites();
-        mFavoritesAdapter = new FavoriteListAdapter(this, mFavorites);
-        lvFavorites.setAdapter(mFavoritesAdapter);
+        etName.setText(mWordList.getName());
 
-        ivHome.setOnClickListener(new View.OnClickListener() {
+        mWordAdapter = new WordAdapter(this, mWordList.getWords());
+        lvWords.setAdapter(mWordAdapter);
+
+        ivAddWord.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent mIntent = new Intent(getApplicationContext(), MainActivity.class);
-                startActivity(mIntent);
-                finish();
             }
         });
 
-        ivAddFavorite.setOnClickListener(new View.OnClickListener() {
+        ivAddWord.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 AlertDialog.Builder addName = new AlertDialog.Builder(mContext);
-                addName.setMessage("Naam toevoegen");
+                addName.setMessage("Woord toevoegen");
 
                 // Set up the input
                 final EditText input = new EditText(view.getContext());
@@ -187,21 +192,22 @@ public class FavoritesActivity extends AppCompatActivity {
                 addName.setPositiveButton("Ja", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        String newName = input.getText().toString();
-                        newName = newName.trim();
-                        if (newName.equals(""))
+                        String sNewWord = input.getText().toString();
+                        sNewWord = sNewWord.trim();
+                        if (sNewWord.equals(""))
                             return;
 
-                        for (String favorite: mFavorites){
-                            if (favorite.equals(newName)){
-                                Toast.makeText(mContext, "'" + newName + "' zit al in de favorieten", Toast.LENGTH_LONG).show();
+                        for (Word word: mWordList.getWords()){
+                            if (word.getWord().equals(sNewWord)){
+                                Toast.makeText(mContext, "'" + sNewWord + "' is al toegevoegd", Toast.LENGTH_LONG).show();
                                 return;
                             }
                         }
 
-                        mFavorites.add(newName);
+                        Word newWord = new Word(sNewWord);
+                        mWordList.getWords().add(newWord);
 
-                        mFavoritesAdapter.notifyDataSetChanged();
+                        mWordAdapter.notifyDataSetChanged();
                     }
                 });
 
@@ -218,24 +224,28 @@ public class FavoritesActivity extends AppCompatActivity {
         bSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Remove current favorites
-                mDatabaseConnection.executeNonReturn("DELETE FROM favorites");
-
-                String favoritesList = "";
-                for (String favorite: mFavorites){
-                    favoritesList += ", ('" + favorite + "')";
+                String name = etName.getText().toString();
+                name = name.trim();
+                if (name.equals("")){
+                    Toast.makeText(mContext, "Geen naam ingevuld", Toast.LENGTH_LONG).show();
+                    return;
                 }
-                String insertQuery = "INSERT INTO favorites(name) VALUES " + favoritesList.substring(1);
-                mDatabaseConnection.executeNonReturn(insertQuery);
 
+                for (WordList wordList: mDatabaseConnection.getWordLists(false)){
+                    if (wordList.getId() != mWordList.getId() && wordList.getName().equals(name)){
+                        Toast.makeText(mContext, "Lijst met de naam '" + name + "' bestaat al", Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                }
+
+                mWordList.setName(name);
+                mWordList.save(mDatabaseConnection);
+
+                Intent result = new Intent();
+                result.putExtra("WordList", mWordList);
+                setResult(RESULT_OK, result);
                 finish();
             }
         });
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        finish();
     }
 }

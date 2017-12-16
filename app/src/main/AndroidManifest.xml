@@ -66,6 +66,16 @@
             android:name=".activity.FavoritesActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_favorites"
+            android:theme="@style/FullscreenTheme" />
+        <activity
+            android:name=".activity.WordListsActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_word_list"
+            android:theme="@style/FullscreenTheme" />
+        <activity
+            android:name=".activity.WordListActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_word_list"
             android:theme="@style/FullscreenTheme"></activity>
     </application>
 
