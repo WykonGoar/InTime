@@ -12,19 +12,16 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.wykon.intime.R;
-import com.wykon.intime.adapter.PlayerListAdapter;
 import com.wykon.intime.adapter.TeamListAdapter;
 import com.wykon.intime.model.DatabaseConnection;
-import com.wykon.intime.model.Game;
-import com.wykon.intime.model.Player;
+import com.wykon.intime.model.Settings;
 import com.wykon.intime.model.Team;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -143,7 +140,7 @@ public class NewGameActivity extends AppCompatActivity {
 
     private Context mContext;
     private DatabaseConnection mDatabaseConnection;
-    private Game mGame;
+    private Settings mSettings;
     private ImageView ivHome;
     private TextView tvWinPoints;
     private TextView tvWordCount;
@@ -163,7 +160,7 @@ public class NewGameActivity extends AppCompatActivity {
         mContext = this;
 
         mDatabaseConnection = new DatabaseConnection(this);
-        mGame = mDatabaseConnection.getGame();
+        mSettings = mDatabaseConnection.getSettings();
 
         ivHome = findViewById(R.id.ivHome);
         tvWinPoints = findViewById(R.id.tvWinPoints);
@@ -171,8 +168,8 @@ public class NewGameActivity extends AppCompatActivity {
         lvTeams = findViewById(R.id.lvTeams);
         ivAddTeam = findViewById(R.id.ivAddTeam);
 
-        tvWinPoints.setText("" + mGame.getWinPoints());
-        tvWordCount.setText("" + mGame.getWordCount());
+        tvWinPoints.setText("" + mSettings.getWinPoints());
+        tvWordCount.setText("" + mSettings.getWordCount());
 
         ivHome.setOnClickListener(new View.OnClickListener() {
             @Override

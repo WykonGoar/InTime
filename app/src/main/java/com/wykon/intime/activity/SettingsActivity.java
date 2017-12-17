@@ -13,11 +13,10 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import com.wykon.intime.R;
 import com.wykon.intime.model.DatabaseConnection;
-import com.wykon.intime.model.Game;
+import com.wykon.intime.model.Settings;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -133,7 +132,7 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private DatabaseConnection mDatabaseConnection;
-    private Game mGame;
+    private Settings mSettings;
     private ImageView ivHome;
     private Spinner sWinPoints;
     private Spinner sWordCount;
@@ -173,9 +172,9 @@ public class SettingsActivity extends AppCompatActivity {
         wordCountAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         sWordCount.setAdapter(wordCountAdapter);
 
-        mGame = mDatabaseConnection.getGame();
-        int winPointIndex = winPointsAdapter.getPosition("" + mGame.getWinPoints());
-        int wordCountIndex = wordCountAdapter.getPosition("" + mGame.getWordCount());
+        mSettings = mDatabaseConnection.getSettings();
+        int winPointIndex = winPointsAdapter.getPosition("" + mSettings.getWinPoints());
+        int wordCountIndex = wordCountAdapter.getPosition("" + mSettings.getWordCount());
 
         sWinPoints.setSelection(winPointIndex);
         sWordCount.setSelection(wordCountIndex);
@@ -184,9 +183,9 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 int selectedWinPoints = Integer.parseInt(adapterView.getItemAtPosition(i).toString());
-                mGame.setWinPoints(selectedWinPoints);
+                mSettings.setWinPoints(selectedWinPoints);
 
-                mGame.save(mDatabaseConnection);
+                mSettings.save(mDatabaseConnection);
             }
 
             @Override
@@ -199,9 +198,9 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 int selectedWordCount = Integer.parseInt(adapterView.getItemAtPosition(i).toString());
-                mGame.setWordCount(selectedWordCount);
+                mSettings.setWordCount(selectedWordCount);
 
-                mGame.save(mDatabaseConnection);
+                mSettings.save(mDatabaseConnection);
             }
 
             @Override

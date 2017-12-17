@@ -12,7 +12,7 @@ import java.util.LinkedList;
 public class WordList implements Serializable{
     private int mId = -1;
     private String mName;
-    private boolean mSelected = false;
+    private boolean mSelected = true;
     private LinkedList<Word> mWords = new LinkedList<Word>();
 
     public WordList() {}

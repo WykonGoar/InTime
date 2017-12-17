@@ -11,17 +11,17 @@ import java.io.Serializable;
 public class Word implements Serializable{
     private int mId = -1;
     private String mWord;
-    private int mUsedLocation;
+    private boolean mSelected = true;
 
     public Word(String word){
         mWord = word;
     }
 
-    public Word(int id, String word, int usedLocation)
+    public Word(int id, String word, boolean selected)
     {
         mId = id;
         mWord = word;
-        mUsedLocation = usedLocation;
+        mSelected = selected;
     }
 
     public int getId(){
@@ -32,36 +32,46 @@ public class Word implements Serializable{
         return mWord;
     }
 
-    public int getUsedLocation() {
-        return mUsedLocation;
+    public boolean isSelected() {
+        return mSelected;
     }
 
     public void setWord(String word) {
         mWord = word;
     }
 
-    public void setUsedLocation(int usedLocation) {
-        mUsedLocation = usedLocation;
+    public void setSelected(boolean selected) {
+        mSelected = selected;
     }
 
     public void save(DatabaseConnection databaseConnection){
-        String query = "UPDATE words SET word = ? WHERE _id = ?";
+        String query = "UPDATE words SET word = ?, selected = ? WHERE _id = ?";
+
+        int iSelected = 0;
+        if (mSelected)
+            iSelected = 1;
 
         SQLiteStatement statement = databaseConnection.getNewStatement(query);
         statement.bindString(1, mWord);
-        statement.bindLong(2, mId);
+        statement.bindLong(2, iSelected);
+        statement.bindLong(3, mId);
 
         databaseConnection.executeNonReturn(statement);
     }
 
     public void insert(DatabaseConnection databaseConnection, int list_id){
-        String query = "INSERT INTO words(word, list_id) VALUES(?, ?);";
+        String query = "INSERT INTO words(word, selected, list_id) VALUES(?, ?, ?);";
+
+        int iSelected = 0;
+        if (mSelected)
+            iSelected = 1;
 
         SQLiteStatement statement = databaseConnection.getNewStatement(query);
         statement.bindString(1, mWord);
-        statement.bindLong(2, list_id);
+        statement.bindLong(2, iSelected);
+        statement.bindLong(3, list_id);
 
-        databaseConnection.executeNonReturn(statement);
+        mId = databaseConnection.executeInsertQuery(statement);
     }
 
     public void delete(DatabaseConnection databaseConnection) {

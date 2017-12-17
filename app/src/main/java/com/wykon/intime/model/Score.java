@@ -2,11 +2,13 @@ package com.wykon.intime.model;
 
 import android.database.sqlite.SQLiteStatement;
 
+import java.io.Serializable;
+
 /**
  * Created by 52 on 06-12-2017.
  */
 
-public class Score {
+public class Score implements Serializable {
     private Team mTeam;
     private int mScore;
 

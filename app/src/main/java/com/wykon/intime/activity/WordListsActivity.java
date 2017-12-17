@@ -13,7 +13,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 
 import com.wykon.intime.R;
-import com.wykon.intime.adapter.WordListAdapter;
+import com.wykon.intime.adapter.WordListListAdapter;
 import com.wykon.intime.model.DatabaseConnection;
 import com.wykon.intime.model.WordList;
 
@@ -139,7 +139,7 @@ public class WordListsActivity extends AppCompatActivity {
     private ImageView ivHome;
     private ImageView ivAddList;
     private ListView lvWordLists;
-    private WordListAdapter mWordListAdapter;
+    private WordListListAdapter mWordListListAdapter;
     private LinkedList<WordList> mWordLists;
 
     @Override
@@ -158,8 +158,8 @@ public class WordListsActivity extends AppCompatActivity {
         lvWordLists = findViewById(R.id.lvWordLists);
 
         mWordLists = mDatabaseConnection.getWordLists(false);
-        mWordListAdapter = new WordListAdapter(this, mWordLists);
-        lvWordLists.setAdapter(mWordListAdapter);
+        mWordListListAdapter = new WordListListAdapter(this, mWordLists);
+        lvWordLists.setAdapter(mWordListListAdapter);
 
         ivHome.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -196,7 +196,7 @@ public class WordListsActivity extends AppCompatActivity {
             WordList wordList = (WordList) data.getSerializableExtra("WordList");
 
             mWordLists.add(wordList);
-            mWordListAdapter.notifyDataSetChanged();
+            mWordListListAdapter.notifyDataSetChanged();
         }
         else if (requestCode == EDIT_WORD_LIST_ID){
             WordList updatedWordList = (WordList) data.getSerializableExtra("WordList");
@@ -213,7 +213,7 @@ public class WordListsActivity extends AppCompatActivity {
 
             mWordLists.remove(listPosition);
             mWordLists.add(listPosition, updatedWordList);
-            mWordListAdapter.notifyDataSetChanged();
+            mWordListListAdapter.notifyDataSetChanged();
         }
     }
 

@@ -29,42 +29,18 @@ public class DatabaseConnection extends Activity {
         mContext = context;
 
         try{
-            String check = "SELECT * FROM lists";
+            String check = "SELECT * FROM settings";
 
             executeReturn(check);
         } catch (SQLiteException ex)
         {
             importDatabaseTables();
-            importWordLists();
         }
     }
 
     private void importDatabaseTables(){
         try {
             InputStream mInputStream = mContext.getAssets().open("InTimeTables.sql");
-
-            BufferedReader mBufferedReader = new BufferedReader(new InputStreamReader(mInputStream));
-
-            String line = null;
-            do {
-                line = mBufferedReader.readLine();
-                System.out.println("readed line");
-                System.out.println(line);
-                if (line != null) {
-                    executeNonReturn(line);
-                }
-            } while (line != null);
-        }catch (IOException ex){
-            System.out.println("Exception raised");
-            System.out.println(ex.getMessage());
-            throw new Error(ex.getMessage());
-        }
-    }
-
-    private void importWordLists(){
-        try {
-            System.out.println("IMPORT WORD LISTS");
-            InputStream mInputStream = mContext.getAssets().open("NewValues.sql");
 
             BufferedReader mBufferedReader = new BufferedReader(new InputStreamReader(mInputStream));
 
@@ -192,10 +168,14 @@ public class DatabaseConnection extends Activity {
             int wordId = mCursor.getInt(mCursor.getColumnIndex("_id"));
             //word
             String wordValue = mCursor.getString(mCursor.getColumnIndex("word"));
-            //usedLocation
-            int usedLocation = mCursor.getInt(mCursor.getColumnIndex("used_location"));
+            //selected
+            int iSelected = mCursor.getInt(mCursor.getColumnIndex("selected"));
+            boolean selected = false;
+            if (iSelected == 1){
+                selected = true;
+            }
 
-            Word word = new Word(wordId, wordValue, usedLocation);
+            Word word = new Word(wordId, wordValue, selected);
             words.add(word);
 
             mCursor.moveToNext();
@@ -205,9 +185,9 @@ public class DatabaseConnection extends Activity {
         return words;
     }
 
-    public Game getGame()
+    public Settings getSettings()
     {
-        String query = "SELECT * FROM games";
+        String query = "SELECT * FROM settings";
         Cursor mCursor = null;
 
         try {
@@ -224,7 +204,7 @@ public class DatabaseConnection extends Activity {
         int wordCount = mCursor.getInt(mCursor.getColumnIndex("word_count"));
 
         mDatabase.close();
-        return new Game(wordCount, winPoints);
+        return new Settings(wordCount, winPoints);
     }
 
     public LinkedList<Word> getUsedWords(){

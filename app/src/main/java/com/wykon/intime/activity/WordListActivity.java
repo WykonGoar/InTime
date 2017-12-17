@@ -18,7 +18,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.wykon.intime.R;
-import com.wykon.intime.adapter.WordAdapter;
+import com.wykon.intime.adapter.WordListAdapter;
 import com.wykon.intime.model.DatabaseConnection;
 import com.wykon.intime.model.Word;
 import com.wykon.intime.model.WordList;
@@ -141,7 +141,7 @@ public class WordListActivity extends AppCompatActivity {
     private EditText etName;
     private ImageView ivAddWord;
     private ListView lvWords;
-    private WordAdapter mWordAdapter;
+    private WordListAdapter mWordListAdapter;
     private Button bSave;
 
     @Override
@@ -170,8 +170,8 @@ public class WordListActivity extends AppCompatActivity {
 
         etName.setText(mWordList.getName());
 
-        mWordAdapter = new WordAdapter(this, mWordList.getWords());
-        lvWords.setAdapter(mWordAdapter);
+        mWordListAdapter = new WordListAdapter(this, mWordList.getWords());
+        lvWords.setAdapter(mWordListAdapter);
 
         ivAddWord.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -207,7 +207,7 @@ public class WordListActivity extends AppCompatActivity {
                         Word newWord = new Word(sNewWord);
                         mWordList.getWords().add(newWord);
 
-                        mWordAdapter.notifyDataSetChanged();
+                        mWordListAdapter.notifyDataSetChanged();
                     }
                 });
 

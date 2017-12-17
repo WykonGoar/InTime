@@ -15,7 +15,7 @@ import android.widget.CheckedTextView;
 
 import com.wykon.intime.R;
 import com.wykon.intime.model.DatabaseConnection;
-import com.wykon.intime.model.Game;
+import com.wykon.intime.model.Settings;
 import com.wykon.intime.model.Word;
 
 import java.util.LinkedList;
@@ -132,7 +132,7 @@ public class ResultActivity extends AppCompatActivity {
     }
 
     private DatabaseConnection mDatabaseConnection;
-    private Game mGame;
+    private Settings mSettings;
 
     private Button bContinue;
     private CheckedTextView ctvWord1;
@@ -160,7 +160,7 @@ public class ResultActivity extends AppCompatActivity {
         ctvWord5 = findViewById(R.id.ctvWord5);
         ctvWord6 = findViewById(R.id.ctvWord6);
 
-        mGame = mDatabaseConnection.getGame();
+        mSettings = mDatabaseConnection.getSettings();
 
         loadWords();
         setOnClickListeners();
@@ -195,7 +195,7 @@ public class ResultActivity extends AppCompatActivity {
         if(ctvWord6.isChecked())
             score++;
 
-        if(score == mGame.getWordCount())
+        if(score == mSettings.getWordCount())
             score++;
 
         return score;
@@ -212,8 +212,8 @@ public class ResultActivity extends AppCompatActivity {
         LinkedList<Word> wordLists = mDatabaseConnection.getUsedWords();
 
         for (Word word: wordLists) {
-            System.out.println("Word " + word.getWord() + " on location " + word.getUsedLocation());
 
+            /*
             switch (word.getUsedLocation()) {
                 case 1:
                     ctvWord1.setText(word.getWord());
@@ -236,6 +236,7 @@ public class ResultActivity extends AppCompatActivity {
                     ctvWord6.setVisibility(View.VISIBLE);
                     break;
             }
+            */
         }
     }
 

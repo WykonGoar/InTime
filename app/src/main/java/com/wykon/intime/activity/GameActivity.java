@@ -14,7 +14,7 @@ import android.widget.TextView;
 
 import com.wykon.intime.R;
 import com.wykon.intime.model.DatabaseConnection;
-import com.wykon.intime.model.Game;
+import com.wykon.intime.model.Settings;
 import com.wykon.intime.model.Word;
 import com.wykon.intime.model.WordList;
 
@@ -135,7 +135,7 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private DatabaseConnection mDatabaseConnection;
-    private Game mGame;
+    private Settings mSettings;
 
     private ProgressBar pbTime;
     private TextView tvWord1;
@@ -165,7 +165,7 @@ public class GameActivity extends AppCompatActivity {
         tvWord5 = findViewById(R.id.tvWord5o);
         tvWord6 = findViewById(R.id.tvWord6);
 
-        mGame = mDatabaseConnection.getGame();
+        mSettings = mDatabaseConnection.getSettings();
 
         loadWords();
         setWords();
@@ -207,7 +207,6 @@ public class GameActivity extends AppCompatActivity {
 
     private void setTvWord(TextView tvWord, int location){
         Word word = getRandomWord();
-        word.setUsedLocation(location);
         mChosenWords.add(word);
         tvWord.setText(word.getWord());
         tvWord.setVisibility(View.VISIBLE);
@@ -219,12 +218,12 @@ public class GameActivity extends AppCompatActivity {
         setTvWord(tvWord3,3);
         setTvWord(tvWord4,4);
 
-        if (mGame.getWordCount() == 4)
+        if (mSettings.getWordCount() == 4)
             return;
 
         setTvWord(tvWord5,5);
 
-        if (mGame.getWordCount() == 5)
+        if (mSettings.getWordCount() == 5)
             return;
 
         setTvWord(tvWord6,6);
@@ -250,7 +249,6 @@ public class GameActivity extends AppCompatActivity {
         for(Word word: mChosenWords){
             String query = "UPDATE words SET used_location = ? WHERE _id = ?";
             SQLiteStatement statement = mDatabaseConnection.getNewStatement(query);
-            statement.bindLong(1, word.getUsedLocation());
             statement.bindLong(2, word.getId());
             mDatabaseConnection.executeNonReturn(statement);
         }
