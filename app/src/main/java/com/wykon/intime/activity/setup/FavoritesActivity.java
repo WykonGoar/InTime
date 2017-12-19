@@ -1,7 +1,9 @@
-package com.wykon.intime.activity;
+package com.wykon.intime.activity.setup;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -9,13 +11,16 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.wykon.intime.R;
-import com.wykon.intime.adapter.WordListListAdapter;
+import com.wykon.intime.activity.MainActivity;
+import com.wykon.intime.adapter.FavoriteListAdapter;
 import com.wykon.intime.model.DatabaseConnection;
-import com.wykon.intime.model.WordList;
 
 import java.util.LinkedList;
 
@@ -23,7 +28,7 @@ import java.util.LinkedList;
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  */
-public class WordListsActivity extends AppCompatActivity {
+public class FavoritesActivity extends AppCompatActivity {
     /**
      * Whether or not the system UI should be auto-hidden after
      * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
@@ -131,22 +136,21 @@ public class WordListsActivity extends AppCompatActivity {
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
     }
 
-    private int ADD_WORD_LIST_ID = 1;
-    private int EDIT_WORD_LIST_ID = 2;
-
     private Context mContext;
     private DatabaseConnection mDatabaseConnection;
     private ImageView ivHome;
-    private ImageView ivAddList;
-    private ListView lvWordLists;
-    private WordListListAdapter mWordListListAdapter;
-    private LinkedList<WordList> mWordLists;
+    private ImageView ivAddFavorite;
+    private ListView lvFavorites;
+    private FavoriteListAdapter mFavoritesAdapter;
+    private Button bSave;
+
+    private LinkedList<String> mFavorites;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_word_lists);
+        setContentView(R.layout.activity_favorites);
 
         mVisible = true;
 
@@ -154,67 +158,80 @@ public class WordListsActivity extends AppCompatActivity {
         mDatabaseConnection = new DatabaseConnection(this);
 
         ivHome = findViewById(R.id.ivHome);
-        ivAddList = findViewById(R.id.ivAddList);
-        lvWordLists = findViewById(R.id.lvWordLists);
+        ivAddFavorite = findViewById(R.id.ivAddFavorite);
+        lvFavorites = findViewById(R.id.lvFavorites);
+        bSave = findViewById(R.id.bSave);
 
-        mWordLists = mDatabaseConnection.getWordLists(false);
-        mWordListListAdapter = new WordListListAdapter(this, mWordLists);
-        lvWordLists.setAdapter(mWordListListAdapter);
+        mFavorites = mDatabaseConnection.getFavorites();
+        mFavoritesAdapter = new FavoriteListAdapter(this, mFavorites);
+        lvFavorites.setAdapter(mFavoritesAdapter);
 
         ivHome.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent mIntent = new Intent(mContext, MainActivity.class);
+                Intent mIntent = new Intent(getApplicationContext(), MainActivity.class);
                 startActivity(mIntent);
                 finish();
             }
         });
 
-        ivAddList.setOnClickListener(new View.OnClickListener() {
+        ivAddFavorite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent mIntent = new Intent(mContext, WordListActivity.class);
+                AlertDialog.Builder addName = new AlertDialog.Builder(mContext);
+                addName.setMessage("Naam toevoegen");
 
-                startActivityForResult(mIntent, ADD_WORD_LIST_ID);
+                // Set up the input
+                final EditText input = new EditText(view.getContext());
+                addName.setView(input);
+
+                addName.setPositiveButton("Ja", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        String newName = input.getText().toString();
+                        newName = newName.trim();
+                        if (newName.equals(""))
+                            return;
+
+                        for (String favorite: mFavorites){
+                            if (favorite.equals(newName)){
+                                Toast.makeText(mContext, "'" + newName + "' zit al in de favorieten", Toast.LENGTH_LONG).show();
+                                return;
+                            }
+                        }
+
+                        mFavorites.add(newName);
+
+                        mFavoritesAdapter.notifyDataSetChanged();
+                    }
+                });
+
+                addName.setNegativeButton("Annuleer", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                    }
+                });
+
+                addName.create().show();
             }
         });
-    }
 
-    public void onEditWordListClick(WordList wordList){
-        Intent mIntent = new Intent(mContext, WordListActivity.class);
-        mIntent.putExtra("WordList", wordList);
+        bSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Remove current favorites
+                mDatabaseConnection.executeNonReturn("DELETE FROM favorites");
 
-        startActivityForResult(mIntent, EDIT_WORD_LIST_ID);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode != RESULT_OK)
-            return;
-
-        if (requestCode == ADD_WORD_LIST_ID){
-            WordList wordList = (WordList) data.getSerializableExtra("WordList");
-
-            mWordLists.add(wordList);
-            mWordListListAdapter.notifyDataSetChanged();
-        }
-        else if (requestCode == EDIT_WORD_LIST_ID){
-            WordList updatedWordList = (WordList) data.getSerializableExtra("WordList");
-
-            int listPosition = 0;
-
-            for (int index = 0; index < mWordLists.size(); index++){
-                WordList wordList = mWordLists.get(index);
-                if (wordList.getId() == updatedWordList.getId()) {
-                    listPosition = index;
-                    break;
+                String favoritesList = "";
+                for (String favorite: mFavorites){
+                    favoritesList += ", ('" + favorite + "')";
                 }
-            }
+                String insertQuery = "INSERT INTO favorites(name) VALUES " + favoritesList.substring(1);
+                mDatabaseConnection.executeNonReturn(insertQuery);
 
-            mWordLists.remove(listPosition);
-            mWordLists.add(listPosition, updatedWordList);
-            mWordListListAdapter.notifyDataSetChanged();
-        }
+                finish();
+            }
+        });
     }
 
     @Override

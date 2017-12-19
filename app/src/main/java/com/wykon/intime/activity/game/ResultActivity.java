@@ -1,10 +1,9 @@
-package com.wykon.intime.activity;
+package com.wykon.intime.activity.game;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.sqlite.SQLiteStatement;
+import android.graphics.Paint;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,14 +11,12 @@ import android.os.Handler;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.Toast;
+import android.widget.CheckedTextView;
 
 import com.wykon.intime.R;
-import com.wykon.intime.adapter.FavoriteListAdapter;
 import com.wykon.intime.model.DatabaseConnection;
+import com.wykon.intime.model.Settings;
+import com.wykon.intime.model.Word;
 
 import java.util.LinkedList;
 
@@ -27,7 +24,7 @@ import java.util.LinkedList;
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  */
-public class FavoritesActivity extends AppCompatActivity {
+public class ResultActivity extends AppCompatActivity {
     /**
      * Whether or not the system UI should be auto-hidden after
      * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
@@ -50,7 +47,6 @@ public class FavoritesActivity extends AppCompatActivity {
         @SuppressLint("InlinedApi")
         @Override
         public void run() {
-            // Delayed removal of status and navigation bar
         }
     };
     private final Runnable mShowPart2Runnable = new Runnable() {
@@ -135,107 +131,169 @@ public class FavoritesActivity extends AppCompatActivity {
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
     }
 
-    private Context mContext;
     private DatabaseConnection mDatabaseConnection;
-    private ImageView ivHome;
-    private ImageView ivAddFavorite;
-    private ListView lvFavorites;
-    private FavoriteListAdapter mFavoritesAdapter;
-    private Button bSave;
+    private Settings mSettings;
 
-    private LinkedList<String> mFavorites;
+    private Button bContinue;
+    private CheckedTextView ctvWord1;
+    private CheckedTextView ctvWord2;
+    private CheckedTextView ctvWord3;
+    private CheckedTextView ctvWord4;
+    private CheckedTextView ctvWord5;
+    private CheckedTextView ctvWord6;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_favorites);
+        setContentView(R.layout.activity_result);
 
         mVisible = true;
 
-        mContext = this;
         mDatabaseConnection = new DatabaseConnection(this);
 
-        ivHome = findViewById(R.id.ivHome);
-        ivAddFavorite = findViewById(R.id.ivAddFavorite);
-        lvFavorites = findViewById(R.id.lvFavorites);
-        bSave = findViewById(R.id.bSave);
+        bContinue = findViewById(R.id.bContinue);
+        ctvWord1 = findViewById(R.id.ctvWord1);
+        ctvWord2 = findViewById(R.id.ctvWord2);
+        ctvWord3 = findViewById(R.id.ctvWord3);
+        ctvWord4 = findViewById(R.id.ctvWord4);
+        ctvWord5 = findViewById(R.id.ctvWord5);
+        ctvWord6 = findViewById(R.id.ctvWord6);
 
-        mFavorites = mDatabaseConnection.getFavorites();
-        mFavoritesAdapter = new FavoriteListAdapter(this, mFavorites);
-        lvFavorites.setAdapter(mFavoritesAdapter);
+        mSettings = mDatabaseConnection.getSettings();
 
-        ivHome.setOnClickListener(new View.OnClickListener() {
+        loadWords();
+        setOnClickListeners();
+
+        mDatabaseConnection.resetWords();
+
+        bContinue.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent mIntent = new Intent(getApplicationContext(), MainActivity.class);
+                Intent mIntent = null;
+
                 startActivity(mIntent);
                 finish();
             }
         });
 
-        ivAddFavorite.setOnClickListener(new View.OnClickListener() {
+    }
+
+    public int getNewPoints(){
+        int score = 0;
+
+        if(ctvWord1.isChecked())
+            score++;
+        if(ctvWord2.isChecked())
+            score++;
+        if(ctvWord3.isChecked())
+            score++;
+        if(ctvWord4.isChecked())
+            score++;
+        if(ctvWord5.isChecked())
+            score++;
+        if(ctvWord6.isChecked())
+            score++;
+
+        if(score == mSettings.getWordCount())
+            score++;
+
+        return score;
+    }
+
+    public void updateScore(int newScore){
+        String query = "UPDATE games SET score = ?";
+        SQLiteStatement statement = mDatabaseConnection.getNewStatement(query);
+        statement.bindLong(1, newScore);
+        mDatabaseConnection.executeNonReturn(statement);
+    }
+
+    public void loadWords(){
+        /*
+        LinkedList<Word> wordLists = mDatabaseConnection.getUsedWords();
+
+        for (Word word: wordLists) {
+            switch (word.getUsedLocation()) {
+                case 1:
+                    ctvWord1.setText(word.getWord());
+                    break;
+                case 2:
+                    ctvWord2.setText(word.getWord());
+                    break;
+                case 3:
+                    ctvWord3.setText(word.getWord());
+                    break;
+                case 4:
+                    ctvWord4.setText(word.getWord());
+                    break;
+                case 5:
+                    ctvWord5.setText(word.getWord());
+                    ctvWord5.setVisibility(View.VISIBLE);
+                    break;
+                case 6:
+                    ctvWord6.setText(word.getWord());
+                    ctvWord6.setVisibility(View.VISIBLE);
+                    break;
+            }
+        }
+        */
+    }
+
+    public void updateCheckedTextView(CheckedTextView ctvWord){
+        if (ctvWord.isChecked()) {
+            ctvWord.setChecked(false);
+            ctvWord.setPaintFlags(0);
+        }
+        else {
+            ctvWord.setChecked(true);
+            ctvWord.setPaintFlags(Paint.STRIKE_THRU_TEXT_FLAG);
+        }
+    }
+
+    public void setOnClickListeners(){
+        ctvWord1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                AlertDialog.Builder addName = new AlertDialog.Builder(mContext);
-                addName.setMessage("Naam toevoegen");
+               updateCheckedTextView(ctvWord1);
 
-                // Set up the input
-                final EditText input = new EditText(view.getContext());
-                addName.setView(input);
-
-                addName.setPositiveButton("Ja", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        String newName = input.getText().toString();
-                        newName = newName.trim();
-                        if (newName.equals(""))
-                            return;
-
-                        for (String favorite: mFavorites){
-                            if (favorite.equals(newName)){
-                                Toast.makeText(mContext, "'" + newName + "' zit al in de favorieten", Toast.LENGTH_LONG).show();
-                                return;
-                            }
-                        }
-
-                        mFavorites.add(newName);
-
-                        mFavoritesAdapter.notifyDataSetChanged();
-                    }
-                });
-
-                addName.setNegativeButton("Annuleer", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                    }
-                });
-
-                addName.create().show();
             }
         });
-
-        bSave.setOnClickListener(new View.OnClickListener() {
+        ctvWord2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Remove current favorites
-                mDatabaseConnection.executeNonReturn("DELETE FROM favorites");
-
-                String favoritesList = "";
-                for (String favorite: mFavorites){
-                    favoritesList += ", ('" + favorite + "')";
-                }
-                String insertQuery = "INSERT INTO favorites(name) VALUES " + favoritesList.substring(1);
-                mDatabaseConnection.executeNonReturn(insertQuery);
-
-                finish();
+                updateCheckedTextView(ctvWord2);
+            }
+        });
+        ctvWord3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                updateCheckedTextView(ctvWord3);
+            }
+        });
+        ctvWord4.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                updateCheckedTextView(ctvWord4);
+            }
+        });
+        ctvWord5.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                updateCheckedTextView(ctvWord5);
+            }
+        });
+        ctvWord6.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                updateCheckedTextView(ctvWord6);
             }
         });
     }
+
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-        finish();
+
     }
+
 }

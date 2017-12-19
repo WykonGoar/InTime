@@ -1,9 +1,6 @@
-package com.wykon.intime.activity;
+package com.wykon.intime.activity.setup;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -11,23 +8,22 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.Toast;
+import android.widget.Spinner;
 
 import com.wykon.intime.R;
-import com.wykon.intime.adapter.WordListAdapter;
+import com.wykon.intime.activity.MainActivity;
 import com.wykon.intime.model.DatabaseConnection;
-import com.wykon.intime.model.Word;
-import com.wykon.intime.model.WordList;
+import com.wykon.intime.model.Settings;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  */
-public class WordListActivity extends AppCompatActivity {
+public class SettingsActivity extends AppCompatActivity {
     /**
      * Whether or not the system UI should be auto-hidden after
      * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
@@ -51,6 +47,7 @@ public class WordListActivity extends AppCompatActivity {
         @Override
         public void run() {
             // Delayed removal of status and navigation bar
+
         }
     };
     private final Runnable mShowPart2Runnable = new Runnable() {
@@ -135,117 +132,104 @@ public class WordListActivity extends AppCompatActivity {
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
     }
 
-    private Context mContext;
     private DatabaseConnection mDatabaseConnection;
-    private WordList mWordList;
-    private EditText etName;
-    private ImageView ivAddWord;
-    private ListView lvWords;
-    private WordListAdapter mWordListAdapter;
-    private Button bSave;
+    private Settings mSettings;
+    private ImageView ivHome;
+    private Spinner sWinPoints;
+    private Spinner sWordCount;
+    private Button bWords;
+    private Button bFavorites;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_word_list);
+        setContentView(R.layout.activity_settings);
 
         mVisible = true;
 
-        mContext = this;
         mDatabaseConnection = new DatabaseConnection(this);
+        ivHome = findViewById(R.id.ivHome);
+        sWinPoints = findViewById(R.id.sWinPoints);
+        sWordCount = findViewById(R.id.sWordCount);
+        bWords = findViewById(R.id.bWords);
+        bFavorites = findViewById(R.id.bFavorites);
 
-        Intent mIntent = getIntent();
-        if(mIntent.hasExtra("WordList")){
-            mWordList = (WordList) mIntent.getSerializableExtra("WordList");
-        }
-        else {
-            mWordList = new WordList();
-        }
-
-        etName = findViewById(R.id.etName);
-        ivAddWord = findViewById(R.id.ivAddWord);
-        lvWords = findViewById(R.id.lvWords);
-        bSave = findViewById(R.id.bSave);
-
-        etName.setText(mWordList.getName());
-
-        mWordListAdapter = new WordListAdapter(this, mWordList.getWords());
-        lvWords.setAdapter(mWordListAdapter);
-
-        ivAddWord.setOnClickListener(new View.OnClickListener() {
+        ivHome.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Intent mIntent = new Intent(getApplicationContext(), MainActivity.class);
+                startActivity(mIntent);
             }
         });
 
-        ivAddWord.setOnClickListener(new View.OnClickListener() {
+        ArrayAdapter<CharSequence> winPointsAdapter = ArrayAdapter.createFromResource(this,
+                R.array.win_points, android.R.layout.simple_dropdown_item_1line);
+        winPointsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        sWinPoints.setAdapter(winPointsAdapter);
+
+        ArrayAdapter<CharSequence> wordCountAdapter = ArrayAdapter.createFromResource(this,
+                R.array.word_count, android.R.layout.simple_dropdown_item_1line);
+        wordCountAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        sWordCount.setAdapter(wordCountAdapter);
+
+        mSettings = mDatabaseConnection.getSettings();
+        int winPointIndex = winPointsAdapter.getPosition("" + mSettings.getWinPoints());
+        int wordCountIndex = wordCountAdapter.getPosition("" + mSettings.getWordCount());
+
+        sWinPoints.setSelection(winPointIndex);
+        sWordCount.setSelection(wordCountIndex);
+
+        sWinPoints.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onClick(View view) {
-                AlertDialog.Builder addName = new AlertDialog.Builder(mContext);
-                addName.setMessage("Woord toevoegen");
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                int selectedWinPoints = Integer.parseInt(adapterView.getItemAtPosition(i).toString());
+                mSettings.setWinPoints(selectedWinPoints);
 
-                // Set up the input
-                final EditText input = new EditText(view.getContext());
-                addName.setView(input);
+                mSettings.save(mDatabaseConnection);
+            }
 
-                addName.setPositiveButton("Ja", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        String sNewWord = input.getText().toString();
-                        sNewWord = sNewWord.trim();
-                        if (sNewWord.equals(""))
-                            return;
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
 
-                        for (Word word: mWordList.getWords()){
-                            if (word.getWord().equals(sNewWord)){
-                                Toast.makeText(mContext, "'" + sNewWord + "' is al toegevoegd", Toast.LENGTH_LONG).show();
-                                return;
-                            }
-                        }
-
-                        Word newWord = new Word(sNewWord);
-                        mWordList.getWords().add(newWord);
-
-                        mWordListAdapter.notifyDataSetChanged();
-                    }
-                });
-
-                addName.setNegativeButton("Annuleer", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                    }
-                });
-
-                addName.create().show();
             }
         });
 
-        bSave.setOnClickListener(new View.OnClickListener() {
+        sWordCount.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onClick(View view) {
-                String name = etName.getText().toString();
-                name = name.trim();
-                if (name.equals("")){
-                    Toast.makeText(mContext, "Geen naam ingevuld", Toast.LENGTH_LONG).show();
-                    return;
-                }
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                int selectedWordCount = Integer.parseInt(adapterView.getItemAtPosition(i).toString());
+                mSettings.setWordCount(selectedWordCount);
 
-                for (WordList wordList: mDatabaseConnection.getWordLists(false)){
-                    if (wordList.getId() != mWordList.getId() && wordList.getName().equals(name)){
-                        Toast.makeText(mContext, "Lijst met de naam '" + name + "' bestaat al", Toast.LENGTH_LONG).show();
-                        return;
-                    }
-                }
+                mSettings.save(mDatabaseConnection);
+            }
 
-                mWordList.setName(name);
-                mWordList.save(mDatabaseConnection);
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
 
-                Intent result = new Intent();
-                result.putExtra("WordList", mWordList);
-                setResult(RESULT_OK, result);
-                finish();
             }
         });
+
+        bWords.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent mIntent = new Intent(getApplicationContext(), WordListsActivity.class);
+                startActivity(mIntent);
+            }
+        });
+
+        bFavorites.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent mIntent = new Intent(getApplicationContext(), FavoritesActivity.class);
+                startActivity(mIntent);
+            }
+        });
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
     }
 }

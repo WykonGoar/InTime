@@ -1,6 +1,7 @@
-package com.wykon.intime.activity;
+package com.wykon.intime.activity.setup;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -8,21 +9,23 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.Spinner;
+import android.widget.ListView;
 
 import com.wykon.intime.R;
+import com.wykon.intime.activity.MainActivity;
+import com.wykon.intime.activity.setup.WordListActivity;
+import com.wykon.intime.adapter.WordListListAdapter;
 import com.wykon.intime.model.DatabaseConnection;
-import com.wykon.intime.model.Settings;
+import com.wykon.intime.model.WordList;
+
+import java.util.LinkedList;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  */
-public class SettingsActivity extends AppCompatActivity {
+public class WordListsActivity extends AppCompatActivity {
     /**
      * Whether or not the system UI should be auto-hidden after
      * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
@@ -46,7 +49,6 @@ public class SettingsActivity extends AppCompatActivity {
         @Override
         public void run() {
             // Delayed removal of status and navigation bar
-
         }
     };
     private final Runnable mShowPart2Runnable = new Runnable() {
@@ -131,99 +133,90 @@ public class SettingsActivity extends AppCompatActivity {
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
     }
 
+    private int ADD_WORD_LIST_ID = 1;
+    private int EDIT_WORD_LIST_ID = 2;
+
+    private Context mContext;
     private DatabaseConnection mDatabaseConnection;
-    private Settings mSettings;
     private ImageView ivHome;
-    private Spinner sWinPoints;
-    private Spinner sWordCount;
-    private Button bWords;
-    private Button bFavorites;
+    private ImageView ivAddList;
+    private ListView lvWordLists;
+    private WordListListAdapter mWordListListAdapter;
+    private LinkedList<WordList> mWordLists;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_settings);
+        setContentView(R.layout.activity_word_lists);
 
         mVisible = true;
 
+        mContext = this;
         mDatabaseConnection = new DatabaseConnection(this);
+
         ivHome = findViewById(R.id.ivHome);
-        sWinPoints = findViewById(R.id.sWinPoints);
-        sWordCount = findViewById(R.id.sWordCount);
-        bWords = findViewById(R.id.bWords);
-        bFavorites = findViewById(R.id.bFavorites);
+        ivAddList = findViewById(R.id.ivAddList);
+        lvWordLists = findViewById(R.id.lvWordLists);
+
+        mWordLists = mDatabaseConnection.getWordLists(false);
+        mWordListListAdapter = new WordListListAdapter(this, mWordLists);
+        lvWordLists.setAdapter(mWordListListAdapter);
 
         ivHome.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent mIntent = new Intent(getApplicationContext(), MainActivity.class);
+                Intent mIntent = new Intent(mContext, MainActivity.class);
                 startActivity(mIntent);
+                finish();
             }
         });
 
-        ArrayAdapter<CharSequence> winPointsAdapter = ArrayAdapter.createFromResource(this,
-                R.array.win_points, android.R.layout.simple_dropdown_item_1line);
-        winPointsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        sWinPoints.setAdapter(winPointsAdapter);
-
-        ArrayAdapter<CharSequence> wordCountAdapter = ArrayAdapter.createFromResource(this,
-                R.array.word_count, android.R.layout.simple_dropdown_item_1line);
-        wordCountAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        sWordCount.setAdapter(wordCountAdapter);
-
-        mSettings = mDatabaseConnection.getSettings();
-        int winPointIndex = winPointsAdapter.getPosition("" + mSettings.getWinPoints());
-        int wordCountIndex = wordCountAdapter.getPosition("" + mSettings.getWordCount());
-
-        sWinPoints.setSelection(winPointIndex);
-        sWordCount.setSelection(wordCountIndex);
-
-        sWinPoints.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                int selectedWinPoints = Integer.parseInt(adapterView.getItemAtPosition(i).toString());
-                mSettings.setWinPoints(selectedWinPoints);
-
-                mSettings.save(mDatabaseConnection);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
-
-        sWordCount.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                int selectedWordCount = Integer.parseInt(adapterView.getItemAtPosition(i).toString());
-                mSettings.setWordCount(selectedWordCount);
-
-                mSettings.save(mDatabaseConnection);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
-
-        bWords.setOnClickListener(new View.OnClickListener() {
+        ivAddList.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent mIntent = new Intent(getApplicationContext(), WordListsActivity.class);
-                startActivity(mIntent);
-            }
-        });
+                Intent mIntent = new Intent(mContext, WordListActivity.class);
 
-        bFavorites.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent mIntent = new Intent(getApplicationContext(), FavoritesActivity.class);
-                startActivity(mIntent);
+                startActivityForResult(mIntent, ADD_WORD_LIST_ID);
             }
         });
+    }
+
+    public void onEditWordListClick(WordList wordList){
+        Intent mIntent = new Intent(mContext, WordListActivity.class);
+        mIntent.putExtra("WordList", wordList);
+
+        startActivityForResult(mIntent, EDIT_WORD_LIST_ID);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode != RESULT_OK)
+            return;
+
+        if (requestCode == ADD_WORD_LIST_ID){
+            WordList wordList = (WordList) data.getSerializableExtra("WordList");
+
+            mWordLists.add(wordList);
+            mWordListListAdapter.notifyDataSetChanged();
+        }
+        else if (requestCode == EDIT_WORD_LIST_ID){
+            WordList updatedWordList = (WordList) data.getSerializableExtra("WordList");
+
+            int listPosition = 0;
+
+            for (int index = 0; index < mWordLists.size(); index++){
+                WordList wordList = mWordLists.get(index);
+                if (wordList.getId() == updatedWordList.getId()) {
+                    listPosition = index;
+                    break;
+                }
+            }
+
+            mWordLists.remove(listPosition);
+            mWordLists.add(listPosition, updatedWordList);
+            mWordListListAdapter.notifyDataSetChanged();
+        }
     }
 
     @Override

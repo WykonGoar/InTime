@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:background="@color/mainBackground"
     android:orientation="vertical"
-    tools:context="com.wykon.intime.activity.SettingsActivity">
+    tools:context="com.wykon.intime.activity.setup.SettingsActivity">
 
     <!-- The primary full-screen view. This can be replaced with whatever view
          is needed to present your content, e.g. VideoView, SurfaceView,

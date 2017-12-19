@@ -11,14 +11,16 @@ import java.io.Serializable;
 public class Player implements Serializable{
     private int mId = -1;
     private String mName;
+    private int mTeamId;
 
     public Player(String name){
         mName = name;
     }
 
-    public Player(int id, String name){
+    public Player(int id, String name, int teamId){
         mId = id;
         mName = name;
+        mTeamId = teamId;
     }
 
     public int getId() {
@@ -27,6 +29,10 @@ public class Player implements Serializable{
 
     public String getName() {
         return mName;
+    }
+
+    public int getTeamId() {
+        return mTeamId;
     }
 
     public void setName(String name) {

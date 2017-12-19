@@ -1,4 +1,4 @@
-package com.wykon.intime.activity;
+package com.wykon.intime.activity.game;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;

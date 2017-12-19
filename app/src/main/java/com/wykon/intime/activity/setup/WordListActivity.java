@@ -1,9 +1,10 @@
-package com.wykon.intime.activity;
+package com.wykon.intime.activity.setup;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.sqlite.SQLiteStatement;
-import android.graphics.Paint;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -11,20 +12,22 @@ import android.os.Handler;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CheckedTextView;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.Toast;
 
 import com.wykon.intime.R;
+import com.wykon.intime.adapter.WordListAdapter;
 import com.wykon.intime.model.DatabaseConnection;
-import com.wykon.intime.model.Settings;
 import com.wykon.intime.model.Word;
-
-import java.util.LinkedList;
+import com.wykon.intime.model.WordList;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  */
-public class ResultActivity extends AppCompatActivity {
+public class WordListActivity extends AppCompatActivity {
     /**
      * Whether or not the system UI should be auto-hidden after
      * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
@@ -47,6 +50,7 @@ public class ResultActivity extends AppCompatActivity {
         @SuppressLint("InlinedApi")
         @Override
         public void run() {
+            // Delayed removal of status and navigation bar
         }
     };
     private final Runnable mShowPart2Runnable = new Runnable() {
@@ -131,170 +135,117 @@ public class ResultActivity extends AppCompatActivity {
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
     }
 
+    private Context mContext;
     private DatabaseConnection mDatabaseConnection;
-    private Settings mSettings;
-
-    private Button bContinue;
-    private CheckedTextView ctvWord1;
-    private CheckedTextView ctvWord2;
-    private CheckedTextView ctvWord3;
-    private CheckedTextView ctvWord4;
-    private CheckedTextView ctvWord5;
-    private CheckedTextView ctvWord6;
+    private WordList mWordList;
+    private EditText etName;
+    private ImageView ivAddWord;
+    private ListView lvWords;
+    private WordListAdapter mWordListAdapter;
+    private Button bSave;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_result);
+        setContentView(R.layout.activity_word_list);
 
         mVisible = true;
 
+        mContext = this;
         mDatabaseConnection = new DatabaseConnection(this);
 
-        bContinue = findViewById(R.id.bContinue);
-        ctvWord1 = findViewById(R.id.ctvWord1);
-        ctvWord2 = findViewById(R.id.ctvWord2);
-        ctvWord3 = findViewById(R.id.ctvWord3);
-        ctvWord4 = findViewById(R.id.ctvWord4);
-        ctvWord5 = findViewById(R.id.ctvWord5);
-        ctvWord6 = findViewById(R.id.ctvWord6);
+        Intent mIntent = getIntent();
+        if(mIntent.hasExtra("WordList")){
+            mWordList = (WordList) mIntent.getSerializableExtra("WordList");
+        }
+        else {
+            mWordList = new WordList();
+        }
 
-        mSettings = mDatabaseConnection.getSettings();
+        etName = findViewById(R.id.etName);
+        ivAddWord = findViewById(R.id.ivAddWord);
+        lvWords = findViewById(R.id.lvWords);
+        bSave = findViewById(R.id.bSave);
 
-        loadWords();
-        setOnClickListeners();
+        etName.setText(mWordList.getName());
 
-        mDatabaseConnection.resetWords();
+        mWordListAdapter = new WordListAdapter(this, mWordList.getWords());
+        lvWords.setAdapter(mWordListAdapter);
 
-        bContinue.setOnClickListener(new View.OnClickListener() {
+        ivAddWord.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent mIntent = null;
+            }
+        });
 
-                startActivity(mIntent);
+        ivAddWord.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder addName = new AlertDialog.Builder(mContext);
+                addName.setMessage("Woord toevoegen");
+
+                // Set up the input
+                final EditText input = new EditText(view.getContext());
+                addName.setView(input);
+
+                addName.setPositiveButton("Ja", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        String sNewWord = input.getText().toString();
+                        sNewWord = sNewWord.trim();
+                        if (sNewWord.equals(""))
+                            return;
+
+                        for (Word word: mWordList.getWords()){
+                            if (word.getWord().equals(sNewWord)){
+                                Toast.makeText(mContext, "'" + sNewWord + "' is al toegevoegd", Toast.LENGTH_LONG).show();
+                                return;
+                            }
+                        }
+
+                        Word newWord = new Word(sNewWord);
+                        mWordList.getWords().add(newWord);
+
+                        mWordListAdapter.notifyDataSetChanged();
+                    }
+                });
+
+                addName.setNegativeButton("Annuleer", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                    }
+                });
+
+                addName.create().show();
+            }
+        });
+
+        bSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String name = etName.getText().toString();
+                name = name.trim();
+                if (name.equals("")){
+                    Toast.makeText(mContext, "Geen naam ingevuld", Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                for (WordList wordList: mDatabaseConnection.getWordLists(false)){
+                    if (wordList.getId() != mWordList.getId() && wordList.getName().equals(name)){
+                        Toast.makeText(mContext, "Lijst met de naam '" + name + "' bestaat al", Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                }
+
+                mWordList.setName(name);
+                mWordList.save(mDatabaseConnection);
+
+                Intent result = new Intent();
+                result.putExtra("WordList", mWordList);
+                setResult(RESULT_OK, result);
                 finish();
             }
         });
-
     }
-
-    public int getNewPoints(){
-        int score = 0;
-
-        if(ctvWord1.isChecked())
-            score++;
-        if(ctvWord2.isChecked())
-            score++;
-        if(ctvWord3.isChecked())
-            score++;
-        if(ctvWord4.isChecked())
-            score++;
-        if(ctvWord5.isChecked())
-            score++;
-        if(ctvWord6.isChecked())
-            score++;
-
-        if(score == mSettings.getWordCount())
-            score++;
-
-        return score;
-    }
-
-    public void updateScore(int newScore){
-        String query = "UPDATE games SET score = ?";
-        SQLiteStatement statement = mDatabaseConnection.getNewStatement(query);
-        statement.bindLong(1, newScore);
-        mDatabaseConnection.executeNonReturn(statement);
-    }
-
-    public void loadWords(){
-        LinkedList<Word> wordLists = mDatabaseConnection.getUsedWords();
-
-        for (Word word: wordLists) {
-
-            /*
-            switch (word.getUsedLocation()) {
-                case 1:
-                    ctvWord1.setText(word.getWord());
-                    break;
-                case 2:
-                    ctvWord2.setText(word.getWord());
-                    break;
-                case 3:
-                    ctvWord3.setText(word.getWord());
-                    break;
-                case 4:
-                    ctvWord4.setText(word.getWord());
-                    break;
-                case 5:
-                    ctvWord5.setText(word.getWord());
-                    ctvWord5.setVisibility(View.VISIBLE);
-                    break;
-                case 6:
-                    ctvWord6.setText(word.getWord());
-                    ctvWord6.setVisibility(View.VISIBLE);
-                    break;
-            }
-            */
-        }
-    }
-
-    public void updateCheckedTextView(CheckedTextView ctvWord){
-        if (ctvWord.isChecked()) {
-            ctvWord.setChecked(false);
-            ctvWord.setPaintFlags(0);
-        }
-        else {
-            ctvWord.setChecked(true);
-            ctvWord.setPaintFlags(Paint.STRIKE_THRU_TEXT_FLAG);
-        }
-    }
-
-    public void setOnClickListeners(){
-        ctvWord1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-               updateCheckedTextView(ctvWord1);
-
-            }
-        });
-        ctvWord2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                updateCheckedTextView(ctvWord2);
-            }
-        });
-        ctvWord3.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                updateCheckedTextView(ctvWord3);
-            }
-        });
-        ctvWord4.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                updateCheckedTextView(ctvWord4);
-            }
-        });
-        ctvWord5.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                updateCheckedTextView(ctvWord5);
-            }
-        });
-        ctvWord6.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                updateCheckedTextView(ctvWord6);
-            }
-        });
-    }
-
-
-    @Override
-    public void onBackPressed() {
-
-    }
-
 }

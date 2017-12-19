@@ -1,7 +1,6 @@
-package com.wykon.intime.activity;
+package com.wykon.intime.activity.game;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -9,23 +8,19 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Spinner;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import com.wykon.intime.R;
 import com.wykon.intime.model.DatabaseConnection;
+import com.wykon.intime.model.Game;
 import com.wykon.intime.model.Player;
-import com.wykon.intime.model.Team;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  */
-public class PlayerActivity extends AppCompatActivity {
+public class NextPlayerActivity extends AppCompatActivity {
     /**
      * Whether or not the system UI should be auto-hidden after
      * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
@@ -133,89 +128,35 @@ public class PlayerActivity extends AppCompatActivity {
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
     }
 
-    private Context mContext;
     private DatabaseConnection mDatabaseConnection;
-    private Team mTeam;
-    private EditText etName;
-    private Spinner sNames;
-    private Button bAdd;
-    private boolean calledByOnCreate = false;
+    private Game mGame;
+    private TextView tvTeam;
+    private TextView tvPlayer;
+    private Button bStart;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_player);
+        setContentView(R.layout.activity_next_player);
 
         mVisible = true;
-
-        mContext = this;
-        Intent mIntent = getIntent();
-        mTeam = (Team) mIntent.getSerializableExtra("Team");
-
         mDatabaseConnection = new DatabaseConnection(this);
-        etName = findViewById(R.id.etName);
-        sNames = findViewById(R.id.sNames);
-        bAdd = findViewById(R.id.bAdd);
 
-        ArrayAdapter<String> winPointsAdapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_dropdown_item_1line, mDatabaseConnection.getFavorites());
-        winPointsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        sNames.setAdapter(winPointsAdapter);
-
-        sNames.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                String name = adapterView.getItemAtPosition(i).toString();
-
-                if (!calledByOnCreate) {
-                    calledByOnCreate = true;
-                    return;
-                }
-
-                returnPlayer(name);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
-
-        bAdd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String name = etName.getText().toString();
-                name = name.trim();
-                if (name.equals("")){
-                    Toast.makeText(mContext, "Geen naam ingevuld", Toast.LENGTH_LONG).show();
-                    return;
-                }
-
-                returnPlayer(name);
-            }
-        });
-
-        etName.setText("");
-    }
-
-    private void returnPlayer(String name){
-        for (Player player: mTeam.getPlayers()){
-            if (player.getName().equals(name)){
-                Toast.makeText(mContext, "Speler met de naam '" + name + "' zit al in het team", Toast.LENGTH_LONG).show();
-                return;
-            }
+        Intent mIntent = getIntent();
+        if(mIntent.hasExtra("Game")){
+            mGame = (Game) mIntent.getSerializableExtra("Game");
+        }
+        else {
+            mGame = mDatabaseConnection.getLatestGame();
         }
 
-        Intent result = new Intent();
-        result.putExtra("Name", name);
-        setResult(RESULT_OK, result);
-        finish();
-    }
+        tvTeam = findViewById(R.id.tvTeam);
+        tvPlayer = findViewById(R.id.tvPlayer);
+        bStart = findViewById(R.id.bStart);
 
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        finish();
+        Player nextPlayer = mGame.getNextPlayer();
+        tvTeam.setText(mGame.getTeam(nextPlayer.getTeamId()).getName());
+        tvPlayer.setText(nextPlayer.getName());
     }
 }

@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:background="@color/mainBackground"
     android:keepScreenOn="true"
-    tools:context="com.wykon.intime.activity.GameActivity">
+    tools:context="com.wykon.intime.activity.game.GameActivity">
 
     <!-- The primary full-screen view. This can be replaced with whatever view
          is needed to present your content, e.g. VideoView, SurfaceView,

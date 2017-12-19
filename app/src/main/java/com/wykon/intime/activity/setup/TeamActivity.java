@@ -1,6 +1,7 @@
-package com.wykon.intime.activity;
+package com.wykon.intime.activity.setup;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -9,17 +10,25 @@ import android.os.Handler;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.Toast;
 
 import com.wykon.intime.R;
-import com.wykon.intime.activity.setup.SettingsActivity;
+import com.wykon.intime.activity.setup.PlayerActivity;
+import com.wykon.intime.adapter.PlayerListAdapter;
 import com.wykon.intime.model.DatabaseConnection;
+import com.wykon.intime.model.Player;
+import com.wykon.intime.model.Team;
+
+import java.util.List;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  */
-public class MainActivity extends AppCompatActivity {
+public class TeamActivity extends AppCompatActivity {
     /**
      * Whether or not the system UI should be auto-hidden after
      * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
@@ -42,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
         @SuppressLint("InlinedApi")
         @Override
         public void run() {
-
+            // Delayed removal of status and navigation bar
         }
     };
     private final Runnable mShowPart2Runnable = new Runnable() {
@@ -127,52 +136,94 @@ public class MainActivity extends AppCompatActivity {
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
     }
 
+    private int ADD_PLAYER_ID = 1;
+
+    private Context mContext;
     private DatabaseConnection mDatabaseConnection;
-    private Button bLoadGame;
-    private Button bNewGame;
-    private Button bRules;
-    private ImageView ivSettings;
+    private Team mTeam;
+    private EditText etName;
+    private ImageView ivAddPlayer;
+    private ListView lvPlayers;
+    private PlayerListAdapter mPlayersAdapter;
+    private Button bSave;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_team);
+
         mVisible = true;
 
+        mContext = this;
         mDatabaseConnection = new DatabaseConnection(this);
 
-        bLoadGame = findViewById(R.id.bLoadGame);
-        bNewGame = findViewById(R.id.bNewGame);
-        bRules = findViewById(R.id.bRules);
-        ivSettings = findViewById(R.id.ivSettings);
+        Intent mIntent = getIntent();
+        if(mIntent.hasExtra("Team")){
+            mTeam = (Team) mIntent.getSerializableExtra("Team");
+        }
+        else {
+            mTeam = new Team();
+        }
 
-        bNewGame.setOnClickListener(new View.OnClickListener() {
+        etName = findViewById(R.id.etName);
+        ivAddPlayer = findViewById(R.id.ivAddPlayer);
+        lvPlayers = findViewById(R.id.lvPlayers);
+        bSave = findViewById(R.id.bSave);
+
+        etName.setText(mTeam.getName());
+
+        mPlayersAdapter = new PlayerListAdapter(this, mTeam.getPlayers());
+        lvPlayers.setAdapter(mPlayersAdapter);
+
+        ivAddPlayer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent mIntent = new Intent(getApplicationContext(), NewGameActivity.class);
-                startActivity(mIntent);
+            Intent mIntent = new Intent(getApplicationContext(), PlayerActivity.class);
+            mIntent.putExtra("Team", mTeam);
+
+            startActivityForResult(mIntent, ADD_PLAYER_ID);
             }
         });
 
-        ivSettings.setOnClickListener(new View.OnClickListener() {
+        bSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent mIntent = new Intent(getApplicationContext(), SettingsActivity.class);
-                startActivity(mIntent);
-            }
+                String name = etName.getText().toString();
+                name = name.trim();
+                if (name.equals("")){
+                    Toast.makeText(mContext, "Geen naam ingevuld", Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                for (Team team : mDatabaseConnection.getTeams()){
+                    if (team.getId() != mTeam.getId() && team.getName().equals(name)){
+                        Toast.makeText(mContext, "Team met de naam '" + name + "' bestaat al", Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                }
+
+                mTeam.setName(name);
+                mTeam.save(mDatabaseConnection);
+
+                Intent result = new Intent();
+                result.putExtra("Team", mTeam);
+                setResult(RESULT_OK, result);
+                finish();
+                }
         });
-
-        bRules.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent mIntent = new Intent(getApplicationContext(), RulesActivity.class);
-                startActivity(mIntent);
-            }
-        });
-
-        bLoadGame.setVisibility(View.GONE);
-
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == ADD_PLAYER_ID){
+            if (resultCode == RESULT_OK){
+                String name = data.getStringExtra("Name");
+
+                List<Player> players = mTeam.getPlayers();
+                players.add(new Player(name));
+                mPlayersAdapter.notifyDataSetChanged();
+            }
+        }
+    }
 }

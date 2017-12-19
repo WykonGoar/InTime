@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteStatement;
 import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Created by 52 on 06-12-2017.
@@ -14,13 +15,19 @@ public class Team implements Serializable{
     private int mId = -1;
     private String mName;
     private List<Player> mPlayers = new LinkedList<Player>();
+    private List<Player> mPlayerOrder = new LinkedList<Player>();
+    private int mScore = 0;
+    private int mLastPlayerIndex = -1;
 
     public Team(){}
 
-    public Team(int id, String name, List<Player> players){
+    public Team(int id, String name, int score, int lastPlayerIndex, List<Player> players, List<Player> playerOrder){
         mId = id;
         mName = name;
+        mScore = score;
+        mLastPlayerIndex = lastPlayerIndex;
         mPlayers = players;
+        mPlayerOrder = playerOrder;
     }
 
     public int getId() {
@@ -29,6 +36,18 @@ public class Team implements Serializable{
 
     public String getName() {
         return mName;
+    }
+
+    public List<Player> getPlayerOrder() {
+        return mPlayerOrder;
+    }
+
+    public int getScore() {
+        return mScore;
+    }
+
+    public int getLastPlayerIndex() {
+        return mLastPlayerIndex;
     }
 
     public List<Player> getPlayers() {
@@ -41,6 +60,50 @@ public class Team implements Serializable{
 
     public void setPlayers(List<Player> players){
         mPlayers = players;
+    }
+
+    public void setPlayerOrder(List<Player> playerOrder) {
+        mPlayerOrder = playerOrder;
+    }
+
+    public void setScore(int score) {
+        mScore = score;
+    }
+
+    public void setLastPlayerIndex(int lastPlayerIndex) {
+        mLastPlayerIndex = lastPlayerIndex;
+    }
+
+    public Player getNextPlayer(){
+        mLastPlayerIndex++;
+        int newPlayerIndex = mLastPlayerIndex;
+
+        if(newPlayerIndex == mPlayers.size()) {
+            newPlayerIndex = 0;
+            mLastPlayerIndex = newPlayerIndex;
+        }
+
+        for(Player p: mPlayerOrder){
+            System.out.println(p.getName());
+        }
+        return mPlayerOrder.get(newPlayerIndex);
+    }
+
+    public void generatePlayerOrder(Random random){
+        mLastPlayerIndex = -1;
+
+        List<Integer> usedIndex = new LinkedList<>();
+
+        for (int i = 0; i < mPlayers.size(); i++){
+            int playerIndex;
+            do {
+                playerIndex = random.nextInt(mPlayers.size());
+            } while (usedIndex.contains(playerIndex));
+
+            Player player = mPlayers.get(playerIndex);
+            mPlayerOrder.add(player);
+            usedIndex.add(playerIndex);
+        }
     }
 
     public void save(DatabaseConnection databaseConnection){

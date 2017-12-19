@@ -23,17 +23,17 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.GameActivity"
+            android:name=".activity.game.GameActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_game"
             android:theme="@style/FullscreenTheme" />
         <activity
-            android:name=".activity.ResultActivity"
+            android:name=".activity.game.ResultActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_result"
             android:theme="@style/FullscreenTheme" />
         <activity
-            android:name=".activity.TimeUpActivity"
+            android:name=".activity.game.TimeUpActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_time_up"
             android:theme="@style/FullscreenTheme" />
@@ -43,7 +43,7 @@
             android:label="@string/title_activity_rules"
             android:theme="@style/FullscreenTheme" />
         <activity
-            android:name=".activity.SettingsActivity"
+            android:name=".activity.setup.SettingsActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_settings"
             android:theme="@style/FullscreenTheme" />
@@ -53,29 +53,34 @@
             android:label="@string/title_activity_new_game"
             android:theme="@style/FullscreenTheme" />
         <activity
-            android:name=".activity.TeamActivity"
+            android:name=".activity.setup.TeamActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_team"
             android:theme="@style/FullscreenTheme" />
         <activity
-            android:name=".activity.PlayerActivity"
+            android:name=".activity.setup.PlayerActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_add_player"
             android:theme="@style/FullscreenTheme" />
         <activity
-            android:name=".activity.FavoritesActivity"
+            android:name=".activity.setup.FavoritesActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_favorites"
             android:theme="@style/FullscreenTheme" />
         <activity
-            android:name=".activity.WordListsActivity"
+            android:name=".activity.setup.WordListsActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_word_list"
             android:theme="@style/FullscreenTheme" />
         <activity
-            android:name=".activity.WordListActivity"
+            android:name=".activity.setup.WordListActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_word_list"
+            android:theme="@style/FullscreenTheme" />
+        <activity
+            android:name=".activity.game.NextPlayerActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_next_player"
             android:theme="@style/FullscreenTheme"></activity>
     </application>
 

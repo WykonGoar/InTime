@@ -1,21 +1,18 @@
 package com.wykon.intime.adapter;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.wykon.intime.R;
-import com.wykon.intime.activity.WordListsActivity;
+import com.wykon.intime.activity.setup.WordListsActivity;
 import com.wykon.intime.model.DatabaseConnection;
 import com.wykon.intime.model.WordList;
 

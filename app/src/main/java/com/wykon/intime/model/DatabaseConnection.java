@@ -134,8 +134,7 @@ public class DatabaseConnection extends Activity {
                 selected = true;
             }
 
-            String wordQuery = "SELECT * FROM words WHERE list_id == " + id + " ORDER BY word";
-            LinkedList<Word> words = getWords(wordQuery);
+            LinkedList<Word> words = getWords(id, inGame);
 
             WordList wordList = new WordList(id, name, selected, words);
 
@@ -149,8 +148,14 @@ public class DatabaseConnection extends Activity {
         return wordLists;
     }
 
-    public LinkedList<Word> getWords(String query)
-    {
+    public LinkedList<Word> getWords(int listId, boolean inGame){
+        String query = "SELECT * FROM words WHERE list_id == " + listId;
+        if (inGame){
+            query += " AND selected == 1";
+        }
+
+        query += " ORDER BY word";
+
         Cursor mCursor = null;
 
         try {
@@ -160,6 +165,8 @@ public class DatabaseConnection extends Activity {
             return new LinkedList<>();
         }
         mCursor.moveToFirst();
+
+        System.out.println("Amount of words in list: " + mCursor.getCount());
 
         LinkedList<Word> words = new LinkedList<>();
 
@@ -185,8 +192,7 @@ public class DatabaseConnection extends Activity {
         return words;
     }
 
-    public Settings getSettings()
-    {
+    public Settings getSettings(){
         String query = "SELECT * FROM settings";
         Cursor mCursor = null;
 
@@ -205,11 +211,6 @@ public class DatabaseConnection extends Activity {
 
         mDatabase.close();
         return new Settings(wordCount, winPoints);
-    }
-
-    public LinkedList<Word> getUsedWords(){
-        String query = "SELECT * FROM words WHERE used_location != -1";
-        return getWords(query);
     }
 
     public void resetWords(){
@@ -263,11 +264,16 @@ public class DatabaseConnection extends Activity {
             int id = mCursor.getInt(mCursor.getColumnIndex("_id"));
             //name
             String name = mCursor.getString(mCursor.getColumnIndex("name"));
+            //score
+            int score = mCursor.getInt(mCursor.getColumnIndex("score"));
+            //last_player_index
+            int last_player_index = mCursor.getInt(mCursor.getColumnIndex("last_player_index"));
 
-            String playerQuery = "SELECT * FROM players WHERE team_id == " + id + "";
-            LinkedList<Player> players = getPlayers(playerQuery);
+            //TODO Order players based on player order
+            LinkedList<Player> players = getPlayers(id);
+            LinkedList<Player> playerOrder = new LinkedList<Player>();
 
-            Team team = new Team(id, name, players);
+            Team team = new Team(id, name, score, last_player_index, players, playerOrder);
 
             teams.add(team);
 
@@ -280,8 +286,8 @@ public class DatabaseConnection extends Activity {
 
     }
 
-    public LinkedList<Player> getPlayers(String query)
-    {
+    public LinkedList<Player> getPlayers(int teamId){
+        String query = "SELECT * FROM players WHERE team_id == " + teamId + "";
         Cursor mCursor = null;
 
         try {
@@ -300,7 +306,7 @@ public class DatabaseConnection extends Activity {
             //name
             String name = mCursor.getString(mCursor.getColumnIndex("name"));
 
-            Player player = new Player(id, name);
+            Player player = new Player(id, name, teamId);
             players.add(player);
 
             mCursor.moveToNext();
@@ -308,6 +314,29 @@ public class DatabaseConnection extends Activity {
 
         mDatabase.close();
         return players;
+    }
+
+    public Game getLatestGame(){
+        String query = "SELECT * FROM games WHERE latest == 1";
+        Cursor mCursor = null;
+
+        try {
+            mCursor = executeReturn(query);
+        } catch (SQLiteException e) {
+            e.printStackTrace();
+            return null;
+        }
+        mCursor.moveToFirst();
+
+        //winPoints
+        int winPoints = mCursor.getInt(mCursor.getColumnIndex("win_points"));
+        //wordCount
+        int wordCount = mCursor.getInt(mCursor.getColumnIndex("word_count"));
+
+        mDatabase.close();
+
+        //TODO Get all values
+        return new Game(wordCount, winPoints);
     }
 }
 

@@ -1,8 +1,8 @@
-package com.wykon.intime.activity;
+package com.wykon.intime.activity.game;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
+import android.os.Vibrator;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -10,24 +10,15 @@ import android.os.Handler;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.Toast;
 
 import com.wykon.intime.R;
-import com.wykon.intime.adapter.PlayerListAdapter;
-import com.wykon.intime.model.DatabaseConnection;
-import com.wykon.intime.model.Player;
-import com.wykon.intime.model.Team;
-
-import java.util.List;
+import com.wykon.intime.activity.game.ResultActivity;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  */
-public class TeamActivity extends AppCompatActivity {
+public class TimeUpActivity extends AppCompatActivity {
     /**
      * Whether or not the system UI should be auto-hidden after
      * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
@@ -135,94 +126,33 @@ public class TeamActivity extends AppCompatActivity {
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
     }
 
-    private int ADD_PLAYER_ID = 1;
-
-    private Context mContext;
-    private DatabaseConnection mDatabaseConnection;
-    private Team mTeam;
-    private EditText etName;
-    private ImageView ivAddPlayer;
-    private ListView lvPlayers;
-    private PlayerListAdapter mPlayersAdapter;
-    private Button bSave;
+    private Button bContinue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_team);
+        setContentView(R.layout.activity_time_up);
 
         mVisible = true;
 
-        mContext = this;
-        mDatabaseConnection = new DatabaseConnection(this);
-
-        Intent mIntent = getIntent();
-        if(mIntent.hasExtra("Team")){
-            mTeam = (Team) mIntent.getSerializableExtra("Team");
-        }
-        else {
-            mTeam = new Team();
-        }
-
-        etName = findViewById(R.id.etName);
-        ivAddPlayer = findViewById(R.id.ivAddPlayer);
-        lvPlayers = findViewById(R.id.lvPlayers);
-        bSave = findViewById(R.id.bSave);
-
-        etName.setText(mTeam.getName());
-
-        mPlayersAdapter = new PlayerListAdapter(this, mTeam.getPlayers());
-        lvPlayers.setAdapter(mPlayersAdapter);
-
-        ivAddPlayer.setOnClickListener(new View.OnClickListener() {
+        bContinue = findViewById(R.id.bContinue);
+        bContinue.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-            Intent mIntent = new Intent(getApplicationContext(), PlayerActivity.class);
-            mIntent.putExtra("Team", mTeam);
-
-            startActivityForResult(mIntent, ADD_PLAYER_ID);
+                Intent mIntent = new Intent(getApplicationContext(), ResultActivity.class);
+                startActivity(mIntent);
+                finish();
             }
         });
 
-        bSave.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String name = etName.getText().toString();
-                name = name.trim();
-                if (name.equals("")){
-                    Toast.makeText(mContext, "Geen naam ingevuld", Toast.LENGTH_LONG).show();
-                    return;
-                }
+        Vibrator v = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+        v.vibrate(1000);
 
-                for (Team team : mDatabaseConnection.getTeams()){
-                    if (team.getId() != mTeam.getId() && team.getName().equals(name)){
-                        Toast.makeText(mContext, "Team met de naam '" + name + "' bestaat al", Toast.LENGTH_LONG).show();
-                        return;
-                    }
-                }
-
-                mTeam.setName(name);
-                mTeam.save(mDatabaseConnection);
-
-                Intent result = new Intent();
-                result.putExtra("Team", mTeam);
-                setResult(RESULT_OK, result);
-                finish();
-                }
-        });
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == ADD_PLAYER_ID){
-            if (resultCode == RESULT_OK){
-                String name = data.getStringExtra("Name");
+    public void onBackPressed() {
 
-                List<Player> players = mTeam.getPlayers();
-                players.add(new Player(name));
-                mPlayersAdapter.notifyDataSetChanged();
-            }
-        }
     }
 }
