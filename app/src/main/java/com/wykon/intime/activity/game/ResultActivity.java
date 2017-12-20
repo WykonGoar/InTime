@@ -15,10 +15,11 @@ import android.widget.CheckedTextView;
 
 import com.wykon.intime.R;
 import com.wykon.intime.model.DatabaseConnection;
+import com.wykon.intime.model.Game;
+import com.wykon.intime.model.Player;
 import com.wykon.intime.model.Settings;
+import com.wykon.intime.model.Team;
 import com.wykon.intime.model.Word;
-
-import java.util.LinkedList;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -132,7 +133,8 @@ public class ResultActivity extends AppCompatActivity {
     }
 
     private DatabaseConnection mDatabaseConnection;
-    private Settings mSettings;
+    private Game mGame;
+    private Player mPlayer;
 
     private Button bContinue;
     private CheckedTextView ctvWord1;
@@ -149,6 +151,9 @@ public class ResultActivity extends AppCompatActivity {
         setContentView(R.layout.activity_result);
 
         mVisible = true;
+        Intent mIntent = getIntent();
+        mGame = (Game) mIntent.getSerializableExtra("Game");
+        mPlayer = (Player) mIntent.getSerializableExtra("Player");
 
         mDatabaseConnection = new DatabaseConnection(this);
 
@@ -160,17 +165,24 @@ public class ResultActivity extends AppCompatActivity {
         ctvWord5 = findViewById(R.id.ctvWord5);
         ctvWord6 = findViewById(R.id.ctvWord6);
 
-        mSettings = mDatabaseConnection.getSettings();
-
         loadWords();
         setOnClickListeners();
-
-        mDatabaseConnection.resetWords();
 
         bContinue.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent mIntent = null;
+                Team team = mGame.getTeam(mPlayer.getTeamId());
+                team.updateScore(mDatabaseConnection, getNewPoints());
+
+                Intent mIntent;
+                if (team.getScore() < mGame.getWinPoints())
+                    mIntent = new Intent(getApplicationContext(), CurrentScoreActivity.class);
+                else {
+                    mIntent = new Intent(getApplicationContext(), WinActivity.class);
+                    mIntent.putExtra("Team", team);
+                }
+
+                mIntent.putExtra("Game", mGame);
 
                 startActivity(mIntent);
                 finish();
@@ -195,48 +207,38 @@ public class ResultActivity extends AppCompatActivity {
         if(ctvWord6.isChecked())
             score++;
 
-        if(score == mSettings.getWordCount())
+        if(score == mGame.getWordCount())
             score++;
 
         return score;
     }
 
-    public void updateScore(int newScore){
-        String query = "UPDATE games SET score = ?";
-        SQLiteStatement statement = mDatabaseConnection.getNewStatement(query);
-        statement.bindLong(1, newScore);
-        mDatabaseConnection.executeNonReturn(statement);
-    }
-
     public void loadWords(){
-        /*
-        LinkedList<Word> wordLists = mDatabaseConnection.getUsedWords();
-
-        for (Word word: wordLists) {
-            switch (word.getUsedLocation()) {
-                case 1:
+        for (int i = 0; i < mGame.getLastUsedWords().size(); i++) {
+            Word word = mGame.getLastUsedWords().get(i);
+            switch (i) {
+                case 0:
                     ctvWord1.setText(word.getWord());
                     break;
-                case 2:
+                case 1:
                     ctvWord2.setText(word.getWord());
                     break;
-                case 3:
+                case 2:
                     ctvWord3.setText(word.getWord());
                     break;
-                case 4:
+                case 3:
                     ctvWord4.setText(word.getWord());
                     break;
-                case 5:
+                case 4:
                     ctvWord5.setText(word.getWord());
                     ctvWord5.setVisibility(View.VISIBLE);
                     break;
-                case 6:
+                case 5:
                     ctvWord6.setText(word.getWord());
                     ctvWord6.setVisibility(View.VISIBLE);
                     break;
             }
         }
-        */
     }
 
     public void updateCheckedTextView(CheckedTextView ctvWord){
@@ -289,7 +291,6 @@ public class ResultActivity extends AppCompatActivity {
             }
         });
     }
-
 
     @Override
     public void onBackPressed() {

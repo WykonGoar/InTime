@@ -13,6 +13,8 @@ import android.widget.Button;
 
 import com.wykon.intime.R;
 import com.wykon.intime.activity.game.ResultActivity;
+import com.wykon.intime.model.Game;
+import com.wykon.intime.model.Player;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -126,6 +128,8 @@ public class TimeUpActivity extends AppCompatActivity {
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
     }
 
+    private Game mGame;
+    private Player mPlayer;
     private Button bContinue;
 
     @Override
@@ -136,11 +140,18 @@ public class TimeUpActivity extends AppCompatActivity {
 
         mVisible = true;
 
+        Intent mIntent = getIntent();
+        mGame = (Game) mIntent.getSerializableExtra("Game");
+        mPlayer = (Player) mIntent.getSerializableExtra("Player");
+
+
         bContinue = findViewById(R.id.bContinue);
         bContinue.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent mIntent = new Intent(getApplicationContext(), ResultActivity.class);
+                mIntent.putExtra("Game", mGame);
+                mIntent.putExtra("Player", mPlayer);
                 startActivity(mIntent);
                 finish();
             }

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:weightSum="1">
+
+    <!--
+    <ImageView
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:id="@+id/ivShow"
+        android:layout_weight="0.18"
+        android:src="@mipmap/ic_launcher"
+        android:scaleType="fitXY" />
+    -->
+
+    <TextView
+        android:id="@+id/tvPosition"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="false"
+        android:layout_centerVertical="true"
+        android:fontFamily="@font/aladin_regular"
+        android:text="TextView"
+        android:textSize="36sp" />
+
+    <TextView
+        android:id="@+id/tvName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="false"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="10dp"
+        android:layout_marginStart="10dp"
+        android:layout_toLeftOf="@+id/tvScore"
+        android:layout_toRightOf="@+id/tvPosition"
+        android:fontFamily="@font/aladin_regular"
+        android:text="TextView"
+        android:textSize="36sp" />
+
+    <TextView
+        android:id="@+id/tvScore"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerInParent="false"
+        android:layout_centerVertical="true"
+        android:fontFamily="@font/aladin_regular"
+        android:text="TextView"
+        android:textSize="36sp" />
+
+</RelativeLayout>

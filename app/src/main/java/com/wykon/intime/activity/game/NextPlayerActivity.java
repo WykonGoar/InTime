@@ -155,8 +155,25 @@ public class NextPlayerActivity extends AppCompatActivity {
         tvPlayer = findViewById(R.id.tvPlayer);
         bStart = findViewById(R.id.bStart);
 
-        Player nextPlayer = mGame.getNextPlayer();
+        final Player nextPlayer = mGame.getNextPlayer();
         tvTeam.setText(mGame.getTeam(nextPlayer.getTeamId()).getName());
         tvPlayer.setText(nextPlayer.getName());
+
+        bStart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent mIntent = new Intent(getApplicationContext(), GameActivity.class);
+                mIntent.putExtra("Game", mGame);
+                mIntent.putExtra("Player", nextPlayer);
+
+                startActivity(mIntent);
+                finish();
+            }
+        });
+    }
+
+    @Override
+    public void onBackPressed() {
+
     }
 }

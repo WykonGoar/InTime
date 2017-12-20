@@ -1,6 +1,7 @@
 package com.wykon.intime.model;
 
 import android.database.sqlite.SQLiteStatement;
+import android.support.annotation.NonNull;
 
 import java.io.Serializable;
 import java.util.LinkedList;
@@ -11,7 +12,7 @@ import java.util.Random;
  * Created by 52 on 06-12-2017.
  */
 
-public class Team implements Serializable{
+public class Team implements Serializable, Comparable<Team>{
     private int mId = -1;
     private String mName;
     private List<Player> mPlayers = new LinkedList<Player>();
@@ -46,6 +47,17 @@ public class Team implements Serializable{
         return mScore;
     }
 
+    public void resetScore(DatabaseConnection databaseConnection){
+        mScore = 0;
+
+        String query = "UPDATE teams SET score = 0 WHERE _id = ?";
+
+        SQLiteStatement statement = databaseConnection.getNewStatement(query);
+        statement.bindLong(1, mId);
+
+        databaseConnection.executeNonReturn(statement);
+    }
+
     public int getLastPlayerIndex() {
         return mLastPlayerIndex;
     }
@@ -66,12 +78,20 @@ public class Team implements Serializable{
         mPlayerOrder = playerOrder;
     }
 
-    public void setScore(int score) {
-        mScore = score;
-    }
-
     public void setLastPlayerIndex(int lastPlayerIndex) {
         mLastPlayerIndex = lastPlayerIndex;
+    }
+
+    public void updateScore(DatabaseConnection databaseConnection, int newPoints){
+        mScore += newPoints;
+
+        String query = "UPDATE teams SET score = ? WHERE _id = ?";
+
+        SQLiteStatement statement = databaseConnection.getNewStatement(query);
+        statement.bindLong(1, mScore);
+        statement.bindLong(2, mId);
+
+        databaseConnection.executeNonReturn(statement);
     }
 
     public Player getNextPlayer(){
@@ -161,6 +181,19 @@ public class Team implements Serializable{
     private void addPlayers(DatabaseConnection databaseConnection){
         for(Player player : mPlayers){
             player.insert(databaseConnection, mId);
+        }
+    }
+
+    @Override
+    public int compareTo(@NonNull Team team) {
+        if (mScore > team.getScore()) {
+            return -1;
+        }
+        else if (mScore <  team.getScore()) {
+            return 1;
+        }
+        else {
+            return 0;
         }
     }
 }

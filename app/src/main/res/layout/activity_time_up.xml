@@ -30,9 +30,9 @@
         android:layout_centerHorizontal="false"
         android:layout_centerInParent="true"
         android:layout_centerVertical="false"
-        android:scaleX="2"
-        android:scaleY="2"
-        android:src="@drawable/stop_watch" />
+        android:scaleX="0.9"
+        android:scaleY="0.9"
+        android:src="@drawable/stop_watch_big" />
 
     <Button
         android:id="@+id/bContinue"

@@ -1,4 +1,4 @@
-package com.wykon.intime.activity;
+package com.wykon.intime.activity.game;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -9,17 +9,17 @@ import android.os.Handler;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
+import android.widget.ListView;
 
 import com.wykon.intime.R;
-import com.wykon.intime.activity.setup.SettingsActivity;
-import com.wykon.intime.model.DatabaseConnection;
+import com.wykon.intime.adapter.ScoreListAdapter;
+import com.wykon.intime.model.Game;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  */
-public class MainActivity extends AppCompatActivity {
+public class CurrentScoreActivity extends AppCompatActivity {
     /**
      * Whether or not the system UI should be auto-hidden after
      * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
         @SuppressLint("InlinedApi")
         @Override
         public void run() {
-
+            // Delayed removal of status and navigation bar
         }
     };
     private final Runnable mShowPart2Runnable = new Runnable() {
@@ -127,53 +127,42 @@ public class MainActivity extends AppCompatActivity {
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
     }
 
-    private DatabaseConnection mDatabaseConnection;
-    private Button bLoadGame;
-    private Button bNewGame;
-    private Button bRules;
-    private ImageView ivSettings;
+    private Game mGame;
+    private ScoreListAdapter mScoresAdapter;
+
+    private ListView lvScores;
+    private Button bContinue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        setTheme(R.style.AppTheme);
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_current_score);
+
         mVisible = true;
+        Intent mIntent = getIntent();
+        mGame = (Game) mIntent.getSerializableExtra("Game");
 
-        mDatabaseConnection = new DatabaseConnection(this);
+        lvScores = findViewById(R.id.lvScores);
+        bContinue = findViewById(R.id.bContinue);
 
-        bLoadGame = findViewById(R.id.bLoadGame);
-        bNewGame = findViewById(R.id.bNewGame);
-        bRules = findViewById(R.id.bRules);
-        ivSettings = findViewById(R.id.ivSettings);
+        mScoresAdapter = new ScoreListAdapter(this, mGame.getTeams());
+        lvScores.setAdapter(mScoresAdapter);
 
-        bNewGame.setOnClickListener(new View.OnClickListener() {
+        bContinue.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent mIntent = new Intent(getApplicationContext(), NewGameActivity.class);
+                Intent mIntent = new Intent(getApplicationContext(), NextPlayerActivity.class);
+                mIntent.putExtra("Game", mGame);
+
                 startActivity(mIntent);
+                finish();
             }
         });
-
-        ivSettings.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent mIntent = new Intent(getApplicationContext(), SettingsActivity.class);
-                startActivity(mIntent);
-            }
-        });
-
-        bRules.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent mIntent = new Intent(getApplicationContext(), RulesActivity.class);
-                startActivity(mIntent);
-            }
-        });
-
-        bLoadGame.setVisibility(View.GONE);
-
     }
 
+    @Override
+    public void onBackPressed() {
+
+    }
 }

@@ -1,4 +1,4 @@
-package com.wykon.intime.activity;
+package com.wykon.intime.activity.game;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -10,16 +10,23 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TextView;
 
 import com.wykon.intime.R;
-import com.wykon.intime.activity.setup.SettingsActivity;
+import com.wykon.intime.activity.MainActivity;
+import com.wykon.intime.adapter.ScoreListAdapter;
 import com.wykon.intime.model.DatabaseConnection;
+import com.wykon.intime.model.Game;
+import com.wykon.intime.model.Team;
+
+import org.w3c.dom.Text;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  */
-public class MainActivity extends AppCompatActivity {
+public class WinActivity extends AppCompatActivity {
     /**
      * Whether or not the system UI should be auto-hidden after
      * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
@@ -42,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
         @SuppressLint("InlinedApi")
         @Override
         public void run() {
-
+            // Delayed removal of status and navigation bar
         }
     };
     private final Runnable mShowPart2Runnable = new Runnable() {
@@ -128,52 +135,61 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private DatabaseConnection mDatabaseConnection;
-    private Button bLoadGame;
-    private Button bNewGame;
-    private Button bRules;
-    private ImageView ivSettings;
+    private Game mGame;
+    private Team mTeam;
+    private ScoreListAdapter mScoresAdapter;
+
+    private ImageView ivHome;
+    private TextView tvWinner;
+    private ListView lvScores;
+    private Button bRematch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        setTheme(R.style.AppTheme);
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_win);
+
         mVisible = true;
+        Intent mIntent = getIntent();
+        mGame = (Game) mIntent.getSerializableExtra("Game");
+        mTeam = (Team) mIntent.getSerializableExtra("Team");
 
         mDatabaseConnection = new DatabaseConnection(this);
 
-        bLoadGame = findViewById(R.id.bLoadGame);
-        bNewGame = findViewById(R.id.bNewGame);
-        bRules = findViewById(R.id.bRules);
-        ivSettings = findViewById(R.id.ivSettings);
+        mGame.finished(mDatabaseConnection);
 
-        bNewGame.setOnClickListener(new View.OnClickListener() {
+        ivHome = findViewById(R.id.ivHome);
+        tvWinner = findViewById(R.id.tvWinner);
+        lvScores = findViewById(R.id.lvScores);
+        bRematch = findViewById(R.id.bRematch);
+
+        tvWinner.setText(mTeam.getName() + " heeft gewonnen!");
+
+        mScoresAdapter = new ScoreListAdapter(this, mGame.getTeams());
+        lvScores.setAdapter(mScoresAdapter);
+
+        ivHome.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent mIntent = new Intent(getApplicationContext(), NewGameActivity.class);
+                Intent mIntent = new Intent(getApplicationContext(), MainActivity.class);
                 startActivity(mIntent);
             }
         });
 
-        ivSettings.setOnClickListener(new View.OnClickListener() {
+        bRematch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent mIntent = new Intent(getApplicationContext(), SettingsActivity.class);
+                Game newGame = new Game(mGame.getWordCount(), mGame.getWinPoints());
+
+                newGame.createGameValues(mDatabaseConnection);
+
+                Intent mIntent = new Intent(getApplicationContext(), NextPlayerActivity.class);
+                mIntent.putExtra("Game", newGame);
+
                 startActivity(mIntent);
+                finish();
             }
         });
-
-        bRules.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent mIntent = new Intent(getApplicationContext(), RulesActivity.class);
-                startActivity(mIntent);
-            }
-        });
-
-        bLoadGame.setVisibility(View.GONE);
-
     }
-
 }

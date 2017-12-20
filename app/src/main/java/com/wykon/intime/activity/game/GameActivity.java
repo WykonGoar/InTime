@@ -14,6 +14,8 @@ import android.widget.TextView;
 
 import com.wykon.intime.R;
 import com.wykon.intime.model.DatabaseConnection;
+import com.wykon.intime.model.Game;
+import com.wykon.intime.model.Player;
 import com.wykon.intime.model.Settings;
 import com.wykon.intime.model.Word;
 import com.wykon.intime.model.WordList;
@@ -134,8 +136,8 @@ public class GameActivity extends AppCompatActivity {
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
     }
 
-    private DatabaseConnection mDatabaseConnection;
-    private Settings mSettings;
+    private Game mGame;
+    private Player mPlayer;
 
     private ProgressBar pbTime;
     private TextView tvWord1;
@@ -145,9 +147,6 @@ public class GameActivity extends AppCompatActivity {
     private TextView tvWord5;
     private TextView tvWord6;
 
-    private ArrayList<Word> mWords = new ArrayList<>();
-    private ArrayList<Word> mChosenWords = new ArrayList<>();
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -155,7 +154,9 @@ public class GameActivity extends AppCompatActivity {
         setContentView(R.layout.activity_game);
         mVisible = true;
 
-        mDatabaseConnection = new DatabaseConnection(this);
+        Intent mIntent = getIntent();
+        mGame = (Game) mIntent.getSerializableExtra("Game");
+        mPlayer = (Player) mIntent.getSerializableExtra("Player");
 
         pbTime = findViewById(R.id.pbTime);
         tvWord1 = findViewById(R.id.tvWord1o);
@@ -165,11 +166,7 @@ public class GameActivity extends AppCompatActivity {
         tvWord5 = findViewById(R.id.tvWord5o);
         tvWord6 = findViewById(R.id.tvWord6);
 
-        mSettings = mDatabaseConnection.getSettings();
-
-        loadWords();
         setWords();
-        processUsedWords();
 
         Thread progressThread = new Thread(new Runnable() {
             @Override
@@ -182,12 +179,12 @@ public class GameActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
 
-                    System.out.println("Passed seconds: " + seconds);
-
                     pbTime.setProgress(seconds);
                 }
 
                 Intent mIntent = new Intent(getApplicationContext(), TimeUpActivity.class);
+                mIntent.putExtra("Game", mGame);
+                mIntent.putExtra("Player", mPlayer);
                 startActivity(mIntent);
                 finish();
             }
@@ -195,63 +192,28 @@ public class GameActivity extends AppCompatActivity {
         progressThread.start();
     }
 
-    public void loadWords(){
-        LinkedList<WordList> wordLists = mDatabaseConnection.getWordLists(true);
-
-        for (WordList list: wordLists) {
-            System.out.println("List name " + list.getName());
-
-            mWords.addAll(list.getWords());
-        }
-    }
-
-    private void setTvWord(TextView tvWord, int location){
-        Word word = getRandomWord();
-        mChosenWords.add(word);
+    private void setTvWord(TextView tvWord, Word word){
         tvWord.setText(word.getWord());
         tvWord.setVisibility(View.VISIBLE);
     }
 
     public void setWords() {
-        setTvWord(tvWord1, 1);
-        setTvWord(tvWord2,2);
-        setTvWord(tvWord3,3);
-        setTvWord(tvWord4,4);
+        LinkedList<Word> words = mGame.generate_random_words();
 
-        if (mSettings.getWordCount() == 4)
+        setTvWord(tvWord1, words.get(0));
+        setTvWord(tvWord2, words.get(1));
+        setTvWord(tvWord3, words.get(2));
+        setTvWord(tvWord4, words.get(3));
+
+        if (mGame.getWordCount() == 4)
             return;
 
-        setTvWord(tvWord5,5);
+        setTvWord(tvWord5, words.get(4));
 
-        if (mSettings.getWordCount() == 5)
+        if (mGame.getWordCount() == 5)
             return;
 
-        setTvWord(tvWord6,6);
-    }
-
-    public Word getRandomWord(){
-        Random random = new Random();
-
-        System.out.println("Words size = " + mWords.size());
-
-        int index = 0;
-        if (mWords.size() > 1){
-            index = random.nextInt(mWords.size() - 1);
-        }
-
-        Word chosen = mWords.get(index);
-        mWords.remove(index);
-        return chosen;
-    }
-
-    public void processUsedWords(){
-        System.out.println("processUsedWords");
-        for(Word word: mChosenWords){
-            String query = "UPDATE words SET used_location = ? WHERE _id = ?";
-            SQLiteStatement statement = mDatabaseConnection.getNewStatement(query);
-            statement.bindLong(2, word.getId());
-            mDatabaseConnection.executeNonReturn(statement);
-        }
+        setTvWord(tvWord6, words.get(5));
     }
 
     @Override

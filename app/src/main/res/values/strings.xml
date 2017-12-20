@@ -61,4 +61,8 @@
     <string name="title_activity_word_list">WordList</string>
 
     <string name="title_activity_next_player">NextPlayer</string>
+
+    <string name="title_activity_current_score">CurrentScore</string>
+
+    <string name="title_activity_win">Win</string>
 </resources>

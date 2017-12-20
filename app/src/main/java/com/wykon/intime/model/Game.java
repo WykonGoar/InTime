@@ -2,6 +2,7 @@ package com.wykon.intime.model;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteStatement;
+import android.provider.ContactsContract;
 import android.widget.Toast;
 
 import java.io.Serializable;
@@ -26,11 +27,13 @@ public class Game implements Serializable{
     private LinkedList<Word> mAllWords = new LinkedList<>();
     private LinkedList<Word> mNewWords = new LinkedList<>();
     private LinkedList<Word> mUsedWords = new LinkedList<>();
-    private LinkedList<Word> mLastUsedWords = new LinkedList<>();
+    private LinkedList<Word> mLastUsedWords;
 
     public Game(int wordCount, int winPoints){
         mWordCount = wordCount;
         mWinPoints = winPoints;
+
+
     }
 
     public Game(int id, int wordCount, int winPoints){
@@ -63,13 +66,23 @@ public class Game implements Serializable{
     public Player getNextPlayer(){
         mLastTeamIndex++;
         int newTeamIndex = mLastTeamIndex;
+        System.out.println("Team size = " + mTeamOrder.size());
 
         if(newTeamIndex == mTeamOrder.size()) {
             newTeamIndex = 0;
             mLastTeamIndex = newTeamIndex;
         }
 
-        return mTeamOrder.get(newTeamIndex).getNextPlayer();
+        System.out.println("Team index = " + mLastTeamIndex);
+        return mTeamOrder.get(mLastTeamIndex).getNextPlayer();
+    }
+
+    public LinkedList<Word> getLastUsedWords() {
+        return mLastUsedWords;
+    }
+
+    public List<Team> getTeams(){
+        return mTeamOrder;
     }
 
     public void setWordCount(int wordCount) {
@@ -78,6 +91,14 @@ public class Game implements Serializable{
 
     public void setWinPoints(int winPoints) {
         mWinPoints = winPoints;
+    }
+
+    public void finished(DatabaseConnection databaseConnection){
+        mFinished = true;
+
+        String finishedQuery = "UPDATE games SET finished = 1 WHERE _id = ?";
+        SQLiteStatement statement = databaseConnection.getNewStatement(finishedQuery);
+        statement.bindLong(1, mId);
     }
 
     public void insert(DatabaseConnection databaseConnection){
@@ -101,6 +122,30 @@ public class Game implements Serializable{
         statement.bindString(3, sTeamOrder);
 
         mId = databaseConnection.executeInsertQuery(statement);
+    }
+
+    public LinkedList<Word> generate_random_words(){
+        Random random = new Random();
+        System.out.println("Words size = " + mNewWords.size());
+
+        mLastUsedWords = new LinkedList<>();
+        for (int i = 0; i < mWordCount; i++){
+            if (mNewWords.size() == 0){
+                mNewWords = new LinkedList<Word>(mAllWords);
+            }
+
+            Word newWord;
+            int index;
+            do {
+                index = random.nextInt(mNewWords.size());
+                newWord = mNewWords.get(index);
+            } while (mLastUsedWords.contains(newWord));
+
+            mLastUsedWords.add(newWord);
+            mNewWords.remove(index);
+        }
+
+        return mLastUsedWords;
     }
 
     public boolean validateGameRequirements(Context context, DatabaseConnection databaseConnection){
@@ -142,10 +187,10 @@ public class Game implements Serializable{
 
     public void createGameValues(DatabaseConnection databaseConnection){
         LinkedList<Team> teams = databaseConnection.getTeams();
-        Random random = new Random();
         List<Integer> usedIndex = new LinkedList<>();
         mLastTeamIndex = -1;
 
+        Random random = new Random();
         for (int i = 0; i < teams.size(); i++){
             int teamIndex;
             do {
@@ -153,6 +198,7 @@ public class Game implements Serializable{
             } while (usedIndex.contains(teamIndex));
 
             Team team = teams.get(teamIndex);
+            team.resetScore(databaseConnection);
             team.generatePlayerOrder(random);
 
             mTeamOrder.add(team);
@@ -165,5 +211,7 @@ public class Game implements Serializable{
         }
 
         mNewWords = new LinkedList<Word>(mAllWords);
+
+        insert(databaseConnection);
     }
 }
