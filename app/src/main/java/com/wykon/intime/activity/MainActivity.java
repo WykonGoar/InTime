@@ -173,7 +173,12 @@ public class MainActivity extends AppCompatActivity {
         });
 
         bLoadGame.setVisibility(View.GONE);
+    }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
     }
 
 }

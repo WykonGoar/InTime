@@ -21,6 +21,8 @@ import com.wykon.intime.model.DatabaseConnection;
 import com.wykon.intime.model.Player;
 import com.wykon.intime.model.Team;
 
+import java.util.LinkedList;
+
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
@@ -158,8 +160,11 @@ public class PlayerActivity extends AppCompatActivity {
         sNames = findViewById(R.id.sNames);
         bAdd = findViewById(R.id.bAdd);
 
+        LinkedList<String> favorites = mDatabaseConnection.getFavorites();
+        favorites.addFirst("Kies favoriet...");
+
         ArrayAdapter<String> winPointsAdapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_dropdown_item_1line, mDatabaseConnection.getFavorites());
+                android.R.layout.simple_dropdown_item_1line, favorites);
         winPointsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         sNames.setAdapter(winPointsAdapter);
 

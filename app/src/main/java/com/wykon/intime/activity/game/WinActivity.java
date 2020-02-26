@@ -174,6 +174,7 @@ public class WinActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent mIntent = new Intent(getApplicationContext(), MainActivity.class);
                 startActivity(mIntent);
+                finish();
             }
         });
 
