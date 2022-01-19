@@ -6,8 +6,10 @@ import android.provider.ContactsContract;
 import android.widget.Toast;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 /**
@@ -24,6 +26,8 @@ public class Game implements Serializable{
 
     private LinkedList<Team> mTeamOrder = new LinkedList<>();
 
+    private LinkedList<WordList> mWordLists;
+    private Map<WordList, LinkedList<Word>> mUsedList = new HashMap<>();
     private LinkedList<Word> mAllWords = new LinkedList<>();
     private LinkedList<Word> mNewWords = new LinkedList<>();
     private LinkedList<Word> mUsedWords = new LinkedList<>();
@@ -124,28 +128,41 @@ public class Game implements Serializable{
         mId = databaseConnection.executeInsertQuery(statement);
     }
 
-    public LinkedList<Word> generate_random_words(){
+    public WordList, LinkedList<Word> generate_random_words(){
         Random random = new Random();
-        System.out.println("Words size = " + mNewWords.size());
 
         mLastUsedWords = new LinkedList<>();
-        for (int i = 0; i < mWordCount; i++){
-            if (mNewWords.size() == 0){
-                mNewWords = new LinkedList<Word>(mAllWords);
-            }
 
-            Word newWord;
-            int index;
-            do {
-                index = random.nextInt(mNewWords.size());
-                newWord = mNewWords.get(index);
-            } while (mLastUsedWords.contains(newWord));
+        int list_index = random.nextInt(mWordLists.size());
+        WordList list = mWordLists.get(list_index);
 
-            mLastUsedWords.add(newWord);
-            mNewWords.remove(index);
+        if (!mUsedList.containsKey(list)) {
+            mUsedList.put(list, new LinkedList<Word>());
         }
 
-        return mLastUsedWords;
+        LinkedList<Word> usedList = mUsedList.get(list);
+        LinkedList<Word> usableWords = new LinkedList<>();
+        for (Word word: list.getWords()){
+            if (!usedList.contains(word)){
+                usableWords.add(word);
+            }
+        }
+
+        if (mWordCount >= usableWords.size()){
+            usableWords.addAll(list.getWords());
+        }
+
+        for (int i = 0; i < mWordCount; i++){
+            Word newWord;
+            int index = random.nextInt(usableWords.size());
+            newWord = usableWords.get(index);
+
+            mLastUsedWords.add(newWord);
+            usedList.add(newWord);
+            usableWords.remove(index);
+        }
+
+        return list, mLastUsedWords;
     }
 
     public boolean validateGameRequirements(Context context, DatabaseConnection databaseConnection){
@@ -190,27 +207,31 @@ public class Game implements Serializable{
         List<Integer> usedIndex = new LinkedList<>();
         mLastTeamIndex = -1;
 
-        Random random = new Random();
-        for (int i = 0; i < teams.size(); i++){
-            int teamIndex;
-            do {
-                teamIndex = random.nextInt(teams.size());
-            } while (usedIndex.contains(teamIndex));
+//        Random random = new Random();
+//        for (int i = 0; i < teams.size(); i++){
+//            int teamIndex;
+//            do {
+//                teamIndex = random.nextInt(teams.size());
+//            } while (usedIndex.contains(teamIndex));
+//
+//            Team team = teams.get(teamIndex);
+//            team.resetScore(databaseConnection);
+//            team.generatePlayerOrder(random);
+//
+//            mTeamOrder.add(team);
+//            usedIndex.add(teamIndex);
+//        }
 
-            Team team = teams.get(teamIndex);
-            team.resetScore(databaseConnection);
-            team.generatePlayerOrder(random);
-
-            mTeamOrder.add(team);
-            usedIndex.add(teamIndex);
-        }
-
-        LinkedList<WordList> wordLists = databaseConnection.getWordLists(true);
-        for (WordList wordList: wordLists){
-            mAllWords.addAll(wordList.getWords());
-        }
-
-        mNewWords = new LinkedList<Word>(mAllWords);
+        mWordLists = databaseConnection.getWordLists(true);
+//        for (WordList wordList: wordLists){
+//            mAllWords.addAll(wordList.getWords());
+//
+//            for (Word w: wordList.getWords()) {
+//
+//            }
+//        }
+//
+//        mNewWords = new LinkedList<Word>(mAllWords);
 
         insert(databaseConnection);
     }

@@ -39,7 +39,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
-            android:text="Nieuw spel" />
+            android:text="Start" />
 
         <Button
             android:id="@+id/bRules"
@@ -48,7 +48,8 @@
             android:layout_below="@+id/bNewGame"
             android:layout_marginBottom="10dp"
             android:drawableEnd="@mipmap/ic_menu_paste_holo_light"
-            android:text="Regels" />
+            android:text="Regels"
+            android:visibility="gone" />
 
     </RelativeLayout>
 

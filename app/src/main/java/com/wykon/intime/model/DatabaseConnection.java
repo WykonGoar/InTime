@@ -40,7 +40,7 @@ public class DatabaseConnection extends Activity {
 
     private void importDatabaseTables(){
         try {
-            InputStream mInputStream = mContext.getAssets().open("InTimeTables.sql");
+            InputStream mInputStream = mContext.getAssets().open("WhatToDraw.sql");
 
             BufferedReader mBufferedReader = new BufferedReader(new InputStreamReader(mInputStream));
 
@@ -63,7 +63,7 @@ public class DatabaseConnection extends Activity {
     }
 
     private void createConnection(){
-        mDatabase = mContext.openOrCreateDatabase("InTimeDB", MODE_PRIVATE, null);
+        mDatabase = mContext.openOrCreateDatabase("WhatToDrawDB", MODE_PRIVATE, null);
     }
 
     public SQLiteStatement getNewStatement(String query){
@@ -205,12 +205,12 @@ public class DatabaseConnection extends Activity {
         mCursor.moveToFirst();
 
         //winPoints
-        int winPoints = mCursor.getInt(mCursor.getColumnIndex("win_points"));
+//        int winPoints = mCursor.getInt(mCursor.getColumnIndex("win_points"));
         //wordCount
         int wordCount = mCursor.getInt(mCursor.getColumnIndex("word_count"));
 
         mDatabase.close();
-        return new Settings(wordCount, winPoints);
+        return new Settings(wordCount);
     }
 
     public void resetWords(){
@@ -218,125 +218,133 @@ public class DatabaseConnection extends Activity {
         executeNonReturn(query);
     }
 
-    public LinkedList<String> getFavorites(){
-        Cursor mCursor = null;
-
-        try {
-            mCursor = executeReturn("SELECT * FROM favorites ORDER BY name");
-        } catch (SQLiteException e) {
-            e.printStackTrace();
-            return new LinkedList<>();
-        }
-        mCursor.moveToFirst();
-
-        LinkedList<String> names = new LinkedList<String>();
-
-        while(!mCursor.isAfterLast()){
-            //Name
-            String name = mCursor.getString(mCursor.getColumnIndex("name"));
-
-            names.add(name);
-
-            mCursor.moveToNext();
-        }
-
-        mDatabase.close();
-        return names;
+    public LinkedList<String> getFavorites() {
+        return new LinkedList<>();
     }
+//        Cursor mCursor = null;
+//
+//        try {
+//            mCursor = executeReturn("SELECT * FROM favorites ORDER BY name");
+//        } catch (SQLiteException e) {
+//            e.printStackTrace();
+//            return new LinkedList<>();
+//        }
+//        mCursor.moveToFirst();
+//
+//        LinkedList<String> names = new LinkedList<String>();
+//
+//        while(!mCursor.isAfterLast()){
+//            //Name
+//            String name = mCursor.getString(mCursor.getColumnIndex("name"));
+//
+//            names.add(name);
+//
+//            mCursor.moveToNext();
+//        }
+//
+//        mDatabase.close();
+//        return names;
+//    }
 
     public LinkedList<Team> getTeams(){
-        String query = "SELECT * FROM teams";
-
-        Cursor mCursor = null;
-        try {
-            mCursor = executeReturn(query);
-        } catch (SQLiteException e) {
-            e.printStackTrace();
-            return new LinkedList<>();
-        }
-
-        mCursor.moveToFirst();
-
-        LinkedList<Team> teams = new LinkedList<>();
-
-        while(!mCursor.isAfterLast()){
-            //Id
-            int id = mCursor.getInt(mCursor.getColumnIndex("_id"));
-            //name
-            String name = mCursor.getString(mCursor.getColumnIndex("name"));
-            //score
-            int score = mCursor.getInt(mCursor.getColumnIndex("score"));
-            //last_player_index
-            int last_player_index = mCursor.getInt(mCursor.getColumnIndex("last_player_index"));
-
-            //TODO Order players based on player order
-            LinkedList<Player> players = getPlayers(id);
-            LinkedList<Player> playerOrder = new LinkedList<Player>();
-
-            Team team = new Team(id, name, score, last_player_index, players, playerOrder);
-
-            teams.add(team);
-
-            mCursor.moveToNext();
-        }
-
-        mDatabase.close();
-
-        return teams;
-
+        return new LinkedList<>();
     }
+//        String query = "SELECT * FROM teams";
+//
+//        Cursor mCursor = null;
+//        try {
+//            mCursor = executeReturn(query);
+//        } catch (SQLiteException e) {
+//            e.printStackTrace();
+//            return new LinkedList<>();
+//        }
+//
+//        mCursor.moveToFirst();
+//
+//        LinkedList<Team> teams = new LinkedList<>();
+//
+//        while(!mCursor.isAfterLast()){
+//            //Id
+//            int id = mCursor.getInt(mCursor.getColumnIndex("_id"));
+//            //name
+//            String name = mCursor.getString(mCursor.getColumnIndex("name"));
+//            //score
+//            int score = mCursor.getInt(mCursor.getColumnIndex("score"));
+//            //last_player_index
+//            int last_player_index = mCursor.getInt(mCursor.getColumnIndex("last_player_index"));
+//
+//            //TODO Order players based on player order
+//            LinkedList<Player> players = getPlayers(id);
+//            LinkedList<Player> playerOrder = new LinkedList<Player>();
+//
+//            Team team = new Team(id, name, score, last_player_index, players, playerOrder);
+//
+//            teams.add(team);
+//
+//            mCursor.moveToNext();
+//        }
+//
+//        mDatabase.close();
+//
+//        return teams;
+//
+//    }
 
     public LinkedList<Player> getPlayers(int teamId){
-        String query = "SELECT * FROM players WHERE team_id == " + teamId + "";
-        Cursor mCursor = null;
-
-        try {
-            mCursor = executeReturn(query);
-        } catch (SQLiteException e) {
-            e.printStackTrace();
-            return new LinkedList<>();
-        }
-        mCursor.moveToFirst();
-
-        LinkedList<Player> players = new LinkedList<>();
-
-        while(!mCursor.isAfterLast()){
-            //id
-            int id = mCursor.getInt(mCursor.getColumnIndex("_id"));
-            //name
-            String name = mCursor.getString(mCursor.getColumnIndex("name"));
-
-            Player player = new Player(id, name, teamId);
-            players.add(player);
-
-            mCursor.moveToNext();
-        }
-
-        mDatabase.close();
-        return players;
+        return new LinkedList<>();
     }
+//        String query = "SELECT * FROM players WHERE team_id == " + teamId + "";
+//        Cursor mCursor = null;
+//
+//        try {
+//            mCursor = executeReturn(query);
+//        } catch (SQLiteException e) {
+//            e.printStackTrace();
+//            return new LinkedList<>();
+//        }
+//        mCursor.moveToFirst();
+//
+//        LinkedList<Player> players = new LinkedList<>();
+//
+//        while(!mCursor.isAfterLast()){
+//            //id
+//            int id = mCursor.getInt(mCursor.getColumnIndex("_id"));
+//            //name
+//            String name = mCursor.getString(mCursor.getColumnIndex("name"));
+//
+//            Player player = new Player(id, name, teamId);
+//            players.add(player);
+//
+//            mCursor.moveToNext();
+//        }
+//
+//        mDatabase.close();
+//        return players;
+//    }
 
     public Game getLatestGame(){
-        String query = "SELECT * FROM games WHERE latest == 1";
-        Cursor mCursor = null;
-
-        try {
-            mCursor = executeReturn(query);
-        } catch (SQLiteException e) {
-            e.printStackTrace();
-            return null;
-        }
-        mCursor.moveToFirst();
-
-        //winPoints
-        int winPoints = mCursor.getInt(mCursor.getColumnIndex("win_points"));
-        //wordCount
-        int wordCount = mCursor.getInt(mCursor.getColumnIndex("word_count"));
-
-        mDatabase.close();
-
-        //TODO Get all values
-        return new Game(wordCount, winPoints);
+        return null;
     }
+//        String query = "SELECT * FROM games WHERE latest == 1";
+//        Cursor mCursor = null;
+//
+//        try {
+//            mCursor = executeReturn(query);
+//        } catch (SQLiteException e) {
+//            e.printStackTrace();
+//            return null;
+//        }
+//        mCursor.moveToFirst();
+//
+//        //winPoints
+//        int winPoints = mCursor.getInt(mCursor.getColumnIndex("win_points"));
+//        //wordCount
+//        int wordCount = mCursor.getInt(mCursor.getColumnIndex("word_count"));
+//
+//        mDatabase.close();
+//
+//        //TODO Get all values
+//        return new Game(wordCount, winPoints);
+//    }
 }
 

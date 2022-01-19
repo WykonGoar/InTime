@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -140,6 +141,8 @@ public class GameActivity extends AppCompatActivity {
     private Player mPlayer;
 
     private ProgressBar pbTime;
+    private Button bNext;
+    private TextView tvCategory;
     private TextView tvWord1;
     private TextView tvWord2;
     private TextView tvWord3;
@@ -156,9 +159,11 @@ public class GameActivity extends AppCompatActivity {
 
         Intent mIntent = getIntent();
         mGame = (Game) mIntent.getSerializableExtra("Game");
-        mPlayer = (Player) mIntent.getSerializableExtra("Player");
+//        mPlayer = (Player) mIntent.getSerializableExtra("Player");
 
-        pbTime = findViewById(R.id.pbTime);
+//        pbTime = findViewById(R.id.pbTime);
+        bNext = findViewById(R.id.bNext);
+        tvCategory = findViewById(R.id.tvCategory);
         tvWord1 = findViewById(R.id.tvWord1o);
         tvWord2 = findViewById(R.id.tvWord2o);
         tvWord3 = findViewById(R.id.tvWord3o);
@@ -168,28 +173,40 @@ public class GameActivity extends AppCompatActivity {
 
         setWords();
 
-        Thread progressThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                for (int seconds = 0; seconds <= 60; seconds++)
-                {
-                    try {
-                        Thread.sleep(500);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-
-                    pbTime.setProgress(seconds);
+        bNext.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent mIntent = new Intent(getApplicationContext(), TimeUpActivity.class);
+                    mIntent.putExtra("Game", mGame);
+                    startActivity(mIntent);
+                    finish();
                 }
-
-                Intent mIntent = new Intent(getApplicationContext(), TimeUpActivity.class);
-                mIntent.putExtra("Game", mGame);
-                mIntent.putExtra("Player", mPlayer);
-                startActivity(mIntent);
-                finish();
             }
-        });
-        progressThread.start();
+
+        );
+
+//        Thread progressThread = new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                for (int seconds = 0; seconds <= 60; seconds++)
+//                {
+//                    try {
+//                        Thread.sleep(500);
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//
+//                    pbTime.setProgress(seconds);
+//                }
+//
+//                Intent mIntent = new Intent(getApplicationContext(), TimeUpActivity.class);
+//                mIntent.putExtra("Game", mGame);
+//                mIntent.putExtra("Player", mPlayer);
+//                startActivity(mIntent);
+//                finish();
+//            }
+//        });
+//        progressThread.start();
     }
 
     private void setTvWord(TextView tvWord, Word word){
@@ -201,8 +218,17 @@ public class GameActivity extends AppCompatActivity {
         LinkedList<Word> words = mGame.generate_random_words();
 
         setTvWord(tvWord1, words.get(0));
+        if (mGame.getWordCount() == 1)
+            return;
+
         setTvWord(tvWord2, words.get(1));
+        if (mGame.getWordCount() == 2)
+            return;
+
         setTvWord(tvWord3, words.get(2));
+        if (mGame.getWordCount() == 3)
+            return;
+
         setTvWord(tvWord4, words.get(3));
 
         if (mGame.getWordCount() == 4)

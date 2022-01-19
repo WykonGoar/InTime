@@ -12,8 +12,12 @@ import android.widget.Button;
 import android.widget.ImageView;
 
 import com.wykon.intime.R;
+import com.wykon.intime.activity.game.GameActivity;
+import com.wykon.intime.activity.game.NextPlayerActivity;
 import com.wykon.intime.activity.setup.SettingsActivity;
 import com.wykon.intime.model.DatabaseConnection;
+import com.wykon.intime.model.Game;
+import com.wykon.intime.model.Settings;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -128,6 +132,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private DatabaseConnection mDatabaseConnection;
+    private Settings mSettings;
     private Button bLoadGame;
     private Button bNewGame;
     private Button bRules;
@@ -143,6 +148,7 @@ public class MainActivity extends AppCompatActivity {
 
         mDatabaseConnection = new DatabaseConnection(this);
 
+        mSettings = mDatabaseConnection.getSettings();
         bLoadGame = findViewById(R.id.bLoadGame);
         bNewGame = findViewById(R.id.bNewGame);
         bRules = findViewById(R.id.bRules);
@@ -151,8 +157,15 @@ public class MainActivity extends AppCompatActivity {
         bNewGame.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent mIntent = new Intent(getApplicationContext(), NewGameActivity.class);
+//                Intent mIntent = new Intent(getApplicationContext(), NewGameActivity.class);
+//                startActivity(mIntent);
+                Game newGame = new Game(mSettings.getWordCount(), mSettings.getWinPoints());
+
+                Intent mIntent = new Intent(getApplicationContext(), GameActivity.class);
+                mIntent.putExtra("Game", newGame);
+
                 startActivity(mIntent);
+                finish();
             }
         });
 

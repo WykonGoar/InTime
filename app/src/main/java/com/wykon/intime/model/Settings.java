@@ -12,9 +12,9 @@ public class Settings implements Serializable{
     private int mWordCount;
     private int mWinPoints;
 
-    public Settings(int wordCount, int winPoints){
+    public Settings(int wordCount){
         mWordCount = wordCount;
-        mWinPoints = winPoints;
+        mWinPoints = 0;
     }
 
     public int getWordCount() {
