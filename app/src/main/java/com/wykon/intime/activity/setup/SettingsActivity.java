@@ -16,7 +16,9 @@ import android.widget.Spinner;
 
 import com.wykon.intime.R;
 import com.wykon.intime.activity.MainActivity;
+import com.wykon.intime.activity.game.GameActivity;
 import com.wykon.intime.model.DatabaseConnection;
+import com.wykon.intime.model.Game;
 import com.wykon.intime.model.Settings;
 
 /**
@@ -139,6 +141,7 @@ public class SettingsActivity extends AppCompatActivity {
     private Spinner sWordCount;
     private Button bWords;
     private Button bFavorites;
+    private Button bStart;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -154,11 +157,25 @@ public class SettingsActivity extends AppCompatActivity {
         sWordCount = findViewById(R.id.sWordCount);
         bWords = findViewById(R.id.bWords);
         bFavorites = findViewById(R.id.bFavorites);
+        bStart = findViewById(R.id.bStart);
 
         ivHome.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent mIntent = new Intent(getApplicationContext(), MainActivity.class);
+                startActivity(mIntent);
+            }
+        });
+
+
+        bStart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Game newGame = new Game(mDatabaseConnection, mSettings.getWordCount(), mSettings.getWinPoints());
+
+                Intent mIntent = new Intent(getApplicationContext(), GameActivity.class);
+                mIntent.putExtra("Game", newGame);
+
                 startActivity(mIntent);
             }
         });

@@ -181,15 +181,15 @@ public class WinActivity extends AppCompatActivity {
         bRematch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Game newGame = new Game(mGame.getWordCount(), mGame.getWinPoints());
-
-                newGame.createGameValues(mDatabaseConnection);
-
-                Intent mIntent = new Intent(getApplicationContext(), NextPlayerActivity.class);
-                mIntent.putExtra("Game", newGame);
-
-                startActivity(mIntent);
-                finish();
+//                Game newGame = new Game(mGame.getWordCount(), mGame.getWinPoints());
+//
+//                newGame.createGameValues(mDatabaseConnection);
+//
+//                Intent mIntent = new Intent(getApplicationContext(), NextPlayerActivity.class);
+//                mIntent.putExtra("Game", newGame);
+//
+//                startActivity(mIntent);
+//                finish();
             }
         });
     }

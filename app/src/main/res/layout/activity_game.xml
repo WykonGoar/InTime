@@ -24,7 +24,8 @@
         android:progress="0"
         android:progressTint="@android:color/background_light"
         android:scaleY="3"
-        android:secondaryProgressTint="@android:color/holo_red_dark" />
+        android:secondaryProgressTint="@android:color/holo_red_dark"
+        android:visibility="gone" />
 
     <RelativeLayout
         android:id="@+id/rlWords"
@@ -32,7 +33,7 @@
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:layout_marginLeft="20dp"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="10dp"
         android:layout_marginRight="20dp"
         android:layout_marginBottom="40dp"
         android:background="@drawable/rounded_backround"
@@ -66,7 +67,7 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/tvCategory"
                     android:layout_centerHorizontal="true"
-                    android:layout_marginTop="30dp"
+                    android:layout_marginTop="60dp"
                     android:fontFamily="@font/aladin_regular"
                     android:text="TextView"
                     android:textColor="@color/gameWord"
@@ -84,7 +85,7 @@
                     android:text="TextView"
                     android:textColor="@color/gameWord"
                     android:textSize="30sp"
-                    android:visibility="visible" />
+                    android:visibility="gone" />
 
                 <TextView
                     android:id="@+id/tvWord3o"
@@ -97,7 +98,7 @@
                     android:text="TextView"
                     android:textColor="@color/gameWord"
                     android:textSize="30sp"
-                    android:visibility="visible" />
+                    android:visibility="gone" />
 
                 <TextView
                     android:id="@+id/tvWord4o"
@@ -110,7 +111,7 @@
                     android:text="TextView"
                     android:textColor="@color/gameWord"
                     android:textSize="30sp"
-                    android:visibility="visible" />
+                    android:visibility="gone" />
 
                 <TextView
                     android:id="@+id/tvWord5o"
@@ -147,8 +148,10 @@
         android:id="@+id/bNext"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/rlWords"
-        android:layout_marginBottom="10dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="20dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
         android:text="Volgende" />
 
 </RelativeLayout>

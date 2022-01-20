@@ -31,13 +31,13 @@ public class Game implements Serializable{
     private LinkedList<Word> mAllWords = new LinkedList<>();
     private LinkedList<Word> mNewWords = new LinkedList<>();
     private LinkedList<Word> mUsedWords = new LinkedList<>();
+    private WordList mLastList;
     private LinkedList<Word> mLastUsedWords;
 
-    public Game(int wordCount, int winPoints){
+    public Game(DatabaseConnection databaseConnection, int wordCount, int winPoints){
         mWordCount = wordCount;
         mWinPoints = winPoints;
-
-
+        mWordLists = databaseConnection.getWordLists(true);
     }
 
     public Game(int id, int wordCount, int winPoints){
@@ -85,6 +85,10 @@ public class Game implements Serializable{
         return mLastUsedWords;
     }
 
+    public WordList getLastList(){
+        return mLastList;
+    }
+
     public List<Team> getTeams(){
         return mTeamOrder;
     }
@@ -128,28 +132,28 @@ public class Game implements Serializable{
         mId = databaseConnection.executeInsertQuery(statement);
     }
 
-    public WordList, LinkedList<Word> generate_random_words(){
+    public void generate_random_words(){
         Random random = new Random();
 
         mLastUsedWords = new LinkedList<>();
 
         int list_index = random.nextInt(mWordLists.size());
-        WordList list = mWordLists.get(list_index);
+        mLastList = mWordLists.get(list_index);
 
-        if (!mUsedList.containsKey(list)) {
-            mUsedList.put(list, new LinkedList<Word>());
+        if (!mUsedList.containsKey(mLastList)) {
+            mUsedList.put(mLastList, new LinkedList<Word>());
         }
 
-        LinkedList<Word> usedList = mUsedList.get(list);
+        LinkedList<Word> usedList = mUsedList.get(mLastList);
         LinkedList<Word> usableWords = new LinkedList<>();
-        for (Word word: list.getWords()){
+        for (Word word: mLastList.getWords()){
             if (!usedList.contains(word)){
                 usableWords.add(word);
             }
         }
 
         if (mWordCount >= usableWords.size()){
-            usableWords.addAll(list.getWords());
+            usableWords.addAll(mLastList.getWords());
         }
 
         for (int i = 0; i < mWordCount; i++){
@@ -161,8 +165,6 @@ public class Game implements Serializable{
             usedList.add(newWord);
             usableWords.remove(index);
         }
-
-        return list, mLastUsedWords;
     }
 
     public boolean validateGameRequirements(Context context, DatabaseConnection databaseConnection){

@@ -176,7 +176,7 @@ public class GameActivity extends AppCompatActivity {
         bNext.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent mIntent = new Intent(getApplicationContext(), TimeUpActivity.class);
+                    Intent mIntent = new Intent(getApplicationContext(), GameActivity.class);
                     mIntent.putExtra("Game", mGame);
                     startActivity(mIntent);
                     finish();
@@ -215,8 +215,11 @@ public class GameActivity extends AppCompatActivity {
     }
 
     public void setWords() {
-        LinkedList<Word> words = mGame.generate_random_words();
+        mGame.generate_random_words();
 
+        tvCategory.setText(mGame.getLastList().getName());
+
+        LinkedList<Word> words = mGame.getLastUsedWords();
         setTvWord(tvWord1, words.get(0));
         if (mGame.getWordCount() == 1)
             return;
@@ -244,6 +247,6 @@ public class GameActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-
+        finish();
     }
 }

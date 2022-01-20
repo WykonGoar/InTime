@@ -34,11 +34,11 @@ public class Settings implements Serializable{
     }
 
     public void save(DatabaseConnection databaseConnection){
-        String query = "UPDATE settings SET win_points = ?, word_count = ?";
+        String query = "UPDATE settings SET word_count = ?";
 
         SQLiteStatement statement = databaseConnection.getNewStatement(query);
-        statement.bindLong(1, mWinPoints);
-        statement.bindLong(2
+//        statement.bindLong(1, mWinPoints);
+        statement.bindLong(1
                 , mWordCount);
 
         databaseConnection.executeNonReturn(statement);

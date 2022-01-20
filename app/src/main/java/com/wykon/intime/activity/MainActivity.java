@@ -159,13 +159,12 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
 //                Intent mIntent = new Intent(getApplicationContext(), NewGameActivity.class);
 //                startActivity(mIntent);
-                Game newGame = new Game(mSettings.getWordCount(), mSettings.getWinPoints());
+                Game newGame = new Game(mDatabaseConnection, mSettings.getWordCount(), mSettings.getWinPoints());
 
                 Intent mIntent = new Intent(getApplicationContext(), GameActivity.class);
                 mIntent.putExtra("Game", newGame);
 
                 startActivity(mIntent);
-                finish();
             }
         });
 

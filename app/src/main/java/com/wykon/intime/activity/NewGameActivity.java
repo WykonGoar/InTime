@@ -211,17 +211,17 @@ public class NewGameActivity extends AppCompatActivity {
         bStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Game newGame = new Game(mSettings.getWordCount(), mSettings.getWinPoints());
-                if(!newGame.validateGameRequirements(mContext, mDatabaseConnection))
-                    return;
-
-                newGame.createGameValues(mDatabaseConnection);
-
-                Intent mIntent = new Intent(getApplicationContext(), NextPlayerActivity.class);
-                mIntent.putExtra("Game", newGame);
-
-                startActivity(mIntent);
-                finish();
+//                Game newGame = new Game(mSettings.getWordCount(), mSettings.getWinPoints());
+//                if(!newGame.validateGameRequirements(mContext, mDatabaseConnection))
+//                    return;
+//
+//                newGame.createGameValues(mDatabaseConnection);
+//
+//                Intent mIntent = new Intent(getApplicationContext(), NextPlayerActivity.class);
+//                mIntent.putExtra("Game", newGame);
+//
+//                startActivity(mIntent);
+//                finish();
             }
         });
     }
