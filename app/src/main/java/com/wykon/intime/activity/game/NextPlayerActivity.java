@@ -134,6 +134,7 @@ public class NextPlayerActivity extends AppCompatActivity {
     private TextView tvPlayer;
     private Button bStart;
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -156,7 +157,7 @@ public class NextPlayerActivity extends AppCompatActivity {
         bStart = findViewById(R.id.bStart);
 
         final Player nextPlayer = mGame.getNextPlayer();
-        tvTeam.setText(mGame.getTeam(nextPlayer.getTeamId()).getName());
+        tvTeam.setText("Team: " + mGame.getTeam(nextPlayer.getTeamId()).getName());
         tvPlayer.setText(nextPlayer.getName());
 
         bStart.setOnClickListener(new View.OnClickListener() {

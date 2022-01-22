@@ -12,6 +12,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckedTextView;
+import android.widget.TextView;
 
 import com.wykon.intime.R;
 import com.wykon.intime.model.DatabaseConnection;
@@ -137,6 +138,7 @@ public class ResultActivity extends AppCompatActivity {
     private Player mPlayer;
 
     private Button bContinue;
+    private TextView tvCategory;
     private CheckedTextView ctvWord1;
     private CheckedTextView ctvWord2;
     private CheckedTextView ctvWord3;
@@ -158,6 +160,7 @@ public class ResultActivity extends AppCompatActivity {
         mDatabaseConnection = new DatabaseConnection(this);
 
         bContinue = findViewById(R.id.bContinue);
+        tvCategory = findViewById(R.id.tvCategory);
         ctvWord1 = findViewById(R.id.ctvWord1);
         ctvWord2 = findViewById(R.id.ctvWord2);
         ctvWord3 = findViewById(R.id.ctvWord3);
@@ -207,13 +210,15 @@ public class ResultActivity extends AppCompatActivity {
         if(ctvWord6.isChecked())
             score++;
 
-        if(score == mGame.getWordCount())
-            score++;
+//        if(score == mGame.getWordCount())
+//            score++;
 
         return score;
     }
 
     public void loadWords(){
+        tvCategory.setText(mGame.getLastList().getName());
+
         for (int i = 0; i < mGame.getLastUsedWords().size(); i++) {
             Word word = mGame.getLastUsedWords().get(i);
             switch (i) {
@@ -222,12 +227,15 @@ public class ResultActivity extends AppCompatActivity {
                     break;
                 case 1:
                     ctvWord2.setText(word.getWord());
+                    ctvWord2.setVisibility(View.VISIBLE);
                     break;
                 case 2:
                     ctvWord3.setText(word.getWord());
+                    ctvWord3.setVisibility(View.VISIBLE);
                     break;
                 case 3:
                     ctvWord4.setText(word.getWord());
+                    ctvWord4.setVisibility(View.VISIBLE);
                     break;
                 case 4:
                     ctvWord5.setText(word.getWord());

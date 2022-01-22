@@ -164,7 +164,7 @@ public class WinActivity extends AppCompatActivity {
         lvScores = findViewById(R.id.lvScores);
         bRematch = findViewById(R.id.bRematch);
 
-        tvWinner.setText(mTeam.getName() + " heeft gewonnen!");
+        tvWinner.setText("Team: " + mTeam.getName() + " heeft gewonnen!");
 
         mScoresAdapter = new ScoreListAdapter(this, mGame.getTeams());
         lvScores.setAdapter(mScoresAdapter);

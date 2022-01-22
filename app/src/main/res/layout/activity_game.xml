@@ -24,7 +24,8 @@
         android:progress="0"
         android:progressTint="@android:color/background_light"
         android:scaleY="3"
-        android:secondaryProgressTint="@android:color/holo_red_dark" />
+        android:secondaryProgressTint="@android:color/holo_red_dark"
+        android:visibility="gone"/>
 
     <RelativeLayout
         android:id="@+id/rlWords"
@@ -50,12 +51,25 @@
                 android:layout_height="wrap_content">
 
                 <TextView
-                    android:id="@+id/tvWord1o"
+                    android:id="@+id/tvCategory"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
                     android:fontFamily="@font/aladin_regular"
                     android:text="TextView"
+                    android:textColor="@color/gameWord"
+                    android:textSize="45sp"
+                    android:visibility="visible" />
+
+                <TextView
+                    android:id="@+id/tvWord1o"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:fontFamily="@font/aladin_regular"
+                    android:layout_below="@id/tvCategory"
+                    android:text="TextView"
+                    android:layout_marginTop="30dp"
                     android:textColor="@color/gameWord"
                     android:textSize="30sp"
                     android:visibility="visible" />
@@ -71,7 +85,7 @@
                     android:text="TextView"
                     android:textColor="@color/gameWord"
                     android:textSize="30sp"
-                    android:visibility="visible" />
+                    android:visibility="gone" />
 
                 <TextView
                     android:id="@+id/tvWord3o"
@@ -84,7 +98,7 @@
                     android:text="TextView"
                     android:textColor="@color/gameWord"
                     android:textSize="30sp"
-                    android:visibility="visible" />
+                    android:visibility="gone" />
 
                 <TextView
                     android:id="@+id/tvWord4o"
@@ -97,7 +111,7 @@
                     android:text="TextView"
                     android:textColor="@color/gameWord"
                     android:textSize="30sp"
-                    android:visibility="visible" />
+                    android:visibility="gone" />
 
                 <TextView
                     android:id="@+id/tvWord5o"
@@ -127,7 +141,15 @@
 
             </RelativeLayout>
         </ScrollView>
-
     </RelativeLayout>
 
+    <Button
+        android:id="@+id/bNext"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="20dp"
+        android:layout_marginStart="20dp"
+        android:text="Volgende" />
 </RelativeLayout>

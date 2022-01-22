@@ -23,6 +23,7 @@
         android:textColor="@android:color/white"
         android:textSize="26sp"
         android:visibility="visible"
+        android:layout_marginTop="5dp"
         tools:text="Geef aan welke woorden geraden zijn" />
 
     <RelativeLayout
@@ -49,6 +50,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
+                <TextView
+                    android:id="@+id/tvCategory"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:fontFamily="@font/aladin_regular"
+                    android:text="TextView"
+                    android:textColor="@color/gameWord"
+                    android:textSize="45sp"
+                    android:visibility="visible" />
+
                 <CheckedTextView
                     android:id="@+id/ctvWord1"
                     android:layout_width="wrap_content"
@@ -61,6 +73,8 @@
                     android:textAllCaps="false"
                     android:textColor="@color/gameWord"
                     android:textSize="30sp"
+                    android:layout_marginTop="30dp"
+                    android:layout_below="@id/tvCategory"
                     tools:text="test" />
 
                 <CheckedTextView
@@ -77,6 +91,7 @@
                     android:textAllCaps="false"
                     android:textColor="@color/gameWord"
                     android:textSize="30sp"
+                    android:visibility="gone"
                     tools:text="test" />
 
                 <CheckedTextView
@@ -93,6 +108,7 @@
                     android:textAllCaps="false"
                     android:textColor="@color/gameWord"
                     android:textSize="30sp"
+                    android:visibility="gone"
                     tools:text="test" />
 
                 <CheckedTextView
@@ -109,6 +125,7 @@
                     android:textAllCaps="false"
                     android:textColor="@color/gameWord"
                     android:textSize="30sp"
+                    android:visibility="gone"
                     tools:text="test" />
 
                 <CheckedTextView

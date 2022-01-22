@@ -7,5 +7,6 @@
     <color name="black_overlay">#66000000</color>
 
     <color name="mainBackground">#0099cc</color>
+    <color name="background">#0099cc</color>
     <color name="gameWord">#1E78FF</color>
 </resources>

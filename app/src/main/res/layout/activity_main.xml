@@ -48,7 +48,8 @@
             android:layout_below="@+id/bNewGame"
             android:layout_marginBottom="10dp"
             android:drawableEnd="@mipmap/ic_menu_paste_holo_light"
-            android:text="Regels" />
+            android:text="Regels"
+            android:visibility="gone" />
 
     </RelativeLayout>
 
