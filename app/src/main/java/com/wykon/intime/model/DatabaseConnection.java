@@ -28,6 +28,7 @@ public class DatabaseConnection extends Activity {
         //mDatabase = database;
         mContext = context;
 
+//        mContext.deleteDatabase("InTimeDB");
         try{
             String check = "SELECT * FROM settings";
 
